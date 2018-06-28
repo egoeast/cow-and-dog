@@ -2,100 +2,54 @@
 <html lang="en">
 <head>
     <link href='/main.css' rel='stylesheet' type='text/css'>
+    <script
+            src="https://code.jquery.com/jquery-2.2.4.min.js"
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+            crossorigin="anonymous">
 
+    </script>
     <meta charset="UTF-8">
     <title>Title</title>
 
 </head>
 <body>
-    <div id="content" onclick="countRabbits()">
-        <div id="cow">
-        </div>
+<div id="content" onclick="countRabbits()">
+    <div id="cow-cicle">
+    <div id="cow">
+        <img src="i/mm_cow_eat.gif">
     </div>
-    <div id="next" >
-        <div id="cont-x" >
-
-        </div>
-        <div id="cont-y" >
-
-        </div>
-        <div id="event-type" >
-
-        </div>
     </div>
-    <script>
-        class GameObject {
+    <!--<svg height="500" width="500" >
 
-            constructor(element) {
-                this.element = document.getElementById(element);
-                let coords = this.element.getBoundingClientRect();
-                this.width = coords.width;
-                this.height = coords.height;
-                this.x = coords.x;
-                this.y = coords.y;
+        <circle id="cow-cicle" cx="50" cy="50" r="40" stroke="black" stroke-width="1" fill="red" />
+    </svg> -->
+</div>
+<div id="next">
+    <div id="cont-x">
 
-            }
+    </div>
+    <div id="cont-y">
 
-            sayHi() {
-                alert(this.element.getBoundingClientRect());
-            }
+    </div>
+    <div id="vector-length">
 
-            calculatePositionIn(event) {
-                let x = event.clientX - this.x;
-                let y = event.clientY - this.y;
-                return [x, y];
-            }
+    </div>
+    <div id="event-type">
 
-        }
-
-        cow = new GameObject('cow');
-
-        var elem = document.getElementById('content');
-        var contX = document.getElementById('cont-x');
-        var contY = document.getElementById('cont-y');
-        //const cow = document.getElementById('cow');
-        var myType = document.getElementsByClassName('event-type');
-        elem.onmouseover = elem.onmouseout = elem.onmousemove = handler;
-        cow.element.onmouseover = cow.element.onmouseout = cow.element.onmousemove = cowHandler;
-
-        function handler(event) {
-
-            //cow.sayHi()
-            //console.log('fasddfsd'+cow.style.top)
-           // while (type < 11) type += ' ';
-            contX.innerText = event.clientX;
-            contY.innerText = event.clientY;
-
-            //myType.innerText = event.type;
-            var type = event.type;
-            //while (type < 11) type += ' ';
-
-            //console.log(type + " target=" + event.target.id)
-            return false;
-        }
-
-        function cowHandler(event) {
-            let coords = cow.element.getBoundingClientRect();
-            console.log(cow.calculatePositionIn(event));
-            //console.log(coords)
-            //cow.style.top = (coords.top +1)+'px';
-
-
-            contX.innerText = event.clientX;
-            //contY.innerText = cow.style.top;
-
-            //myType.innerText = event.type;
-            var type = event.type;
-            while (type < 11) type += ' ';
-
-            console.log(type + " target=" + event.target.id)
-            return false;
-        }
+    </div>
+    <svg id="vector" height="400" width="450">
+        <path  id="lineAB" d="M 100 350 l 150 -300" stroke="green"
+              stroke-width="3" fill="none" />
+        <!-- Mark relevant points -->
+        <!-- Label the points -->
+    </svg>
+</div>
+<script>
 
 
 
-    </script>
-    <script src="/main.js"></script>
+</script>
+<script src="/main.js"></script>
 </body>
 document
 </html>

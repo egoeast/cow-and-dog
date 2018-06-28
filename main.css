@@ -1,16 +1,28 @@
 #cow {
-    background: black;
-    height: 50px;
-    width: 50px;
+    height: 100px;
+    width: 100px;
+   /* position: absolute;
+    top: 150px;
+    left: 150px;
+   */ /*background-image: url('i/cow_step-1_moos.png');*/
+}
+
+#cow-cicle {
+    /*height: 150px;
+    width: 150px;*/
+    padding: 50px;
     position: absolute;
-    top: 50px;
-    left: 50px;
+    top: 150px;
+    left: 150px;
+    /*z-index: 10;*/
+    background: red;
 }
 
 #content {
     width: 500px;
     height: 500px;
     background: aliceblue;
+   /* cursor: url('i/dog_step-5-barks.png'), pointer;*/
 }
 
 #next {
