@@ -1,3 +1,15 @@
+.obj {
+    position: absolute;
+}
+
+#rock{
+    background: darkgrey;
+    height: 100px;
+    width: 100px;
+    top: 150px;
+    left: 150px;
+    position: absolute;
+}
 #cow {
     height: 100px;
     width: 100px;
@@ -10,16 +22,16 @@
 #cow-cicle {
     /*height: 150px;
     width: 150px;*/
-    padding: 100px;
+    padding: 50px;
     position: absolute;
-    top: 150px;
+    top: 550px;
     left: 150px;
     /*z-index: 10;*/
-    /*background: red;*/
+    background: red;
 }
 
 #content {
-    width: 500px;
+    width: 1500px;
     height: 500px;
     background: aliceblue;
    /* cursor: url('i/dog_step-5-barks.png'), pointer;*/
