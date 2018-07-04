@@ -1,5 +1,10 @@
 .obj {
     position: absolute;
+    background: green;
+}
+
+.obj img{
+    border-radius: 50px;
 }
 
 #rock{
@@ -41,4 +46,10 @@
     width: 500px;
     height: 500px;
     background: red;
+}
+
+#wall {
+    background: black;
+    width: 10px;
+    height: 200px;
 }
