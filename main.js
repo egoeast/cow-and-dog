@@ -33,7 +33,6 @@ class Point {
 
 class Vector extends Point {
     prepareDirection(l) {
-        //let tmp = new Vector();
         let ln = Math.sqrt(this.x * this.x + this.y * this.y);
         this.x = (this.x / ln) * l;
         this.y = (this.y / ln) * l;
@@ -61,9 +60,9 @@ class Vector extends Point {
 class BaseObject {
 
     constructor(container, id, point, width, height) {
-        /*  this.element = document.getElementById(element);
-          let params = this.element.getBoundingClientRect();*/
+        this.container = container;
         this.width = width;
+
         this.height = height;
         this.location = point;
 
@@ -71,6 +70,8 @@ class BaseObject {
         this.center = center;
 
         this.element = document.createElement('div');
+        this.element.style.width = width + 'px';
+        this.element.style.height = height + 'px';
         container.appendChild(this.element);
         this.element.className = 'obj';
         this.element.id = id;
@@ -78,6 +79,7 @@ class BaseObject {
     }
 
     setPorition() {
+        this.center = new Point(this.location.getX + this.width / 2, this.location.getY + this.height / 2)
         this.element.style.top = this.location.getY + 'px';
         this.element.style.left = this.location.getX + 'px';
     }
@@ -103,15 +105,22 @@ class BaseObject {
 
     }
 
-    /*  calculatePositionIn(event) {
-          let x = event.clientX - this.x;
-          let y = event.clientY - this.y;
-          return [x, y];
-      }
-  */
-
 }
 
+class Wall extends BaseObject {
+    constructor(element, id, point, width, height) {
+        super(element, id, point, width, height);
+        this.element.style.background = 'black';
+    }
+}
+
+
+class Stall extends BaseObject {
+    constructor(element, id, point, width, height) {
+        super(element, id, point, width, height);
+        this.element.style.background = 'grey';
+    }
+}
 
 class MovableObject extends BaseObject {
 
@@ -123,40 +132,66 @@ class MovableObject extends BaseObject {
     }
 
     move() {
-        let vector = this.vector;
-        this.location.setCoord = [this.getX + vector.getX, this.getY + vector.getY];
-        this.center.setCoord = [this.getX + this.width / 2, this.getY + this.height / 2];
-        if (this.getX < 0) this.location.x = 0;
-        if (this.getY < 0) this.location.y = 0;
-        this.element.style.top = (this.getY) + 'px';
-        this.element.style.left = (this.getX) + 'px';
+        if (this.moving) {
+            let vector = this.vector;
+            this.location.setCoord = [this.getX + vector.getX, this.getY + vector.getY];
+            this.center.setCoord = [this.getX + this.width / 2, this.getY + this.height / 2];
+            if (this.getX < 0) this.location.x = 0;
+            if (this.getY < 0) this.location.y = 0;
+
+            if (this.getX > this.container.clientWidth - this.width / 2) this.location.x = this.container.clientWidth - this.width / 2;
+            if (this.getY > this.container.clientHeight - this.height / 2) this.location.y = this.container.clientHeight - this.height / 2;
+            this.element.style.top = (this.getY) + 'px';
+            this.element.style.left = (this.getX) + 'px';
+        }
     }
 
     moveTo(x, y) {
         this.location.setCoord = [x, y];
         this.element.style.top = (this.getY) + 'px';
         this.element.style.left = (this.getX) + 'px';
+        this.setPorition();
     }
 
     isCollideWith(object) {
-        /*if (this.calculateDistanceToPoint(object.getX, object.getY) < this.width) {
-            return true;
-        }*/
-        //console.log((this.calculateDistanceToPoint(object.getX, this.center.y) ) );
 
-        //console.log(this.calculateDistanceToPoint(this.center.x, object.center.y));
-        let collideX = (this.calculateDistanceToPoint(object.center.x, this.center.y)) < (this.width/2 + object.width/2);
-        let collideY = (this.calculateDistanceToPoint(this.center.x, object.center.y)) < (this.height/2 + object.height/2) ;
+        let distanceX = this.calculateDistanceToPoint(object.center.x, this.center.y);
+        let distanceY = this.calculateDistanceToPoint(this.center.x, object.center.y);
 
-       // console.log(this.calculateDistanceToPoint(object.getX, this.center.y + this.vector.y));
-        if (collideX && collideY) {
-            //this.vector.x = (this.width/2 + object.width/2) - this.calculateDistanceToPoint(object.center.x, this.center.y);
-            //this.vector.y = (this.height/2 + object.height/2) - (this.calculateDistanceToPoint(this.center.x, object.center.y)) ;
-            if (Math.abs(this.vector.x) >= Math.abs(this.vector.y)) {
-                this.vector.x = -(this.width/2 + object.width/2) + this.calculateDistanceToPoint(object.center.x, this.center.y);
+        let directionX = 0;
+        if (this.vector.x > 0) {
+            directionX = 1
+        } else {
+            directionX = -1
+        }
+        let directionY = 0;
+        if (this.vector.y > 0) {
+            directionY = 1
+        } else {
+            directionY = -1
+        }
+        let collideX;
+        let collideY;
+        //Определяем с какой стороны от обекта находится наш обЪект
+        if (this.center.x < object.center.x) {
+            collideX = distanceX - this.vector.x;
+        } else {
+            collideX = distanceX + this.vector.x;
+        }
+        if (this.center.y < object.center.y) {
+            collideY = distanceY - this.vector.y;
+        } else {
+            collideY = distanceY + this.vector.y;
+        }
+
+
+        if ((collideX < object.width / 2 + this.width / 2) && (collideY < object.height / 2 + this.height / 2)) {
+
+            if ((this.width / 2 + object.width / 2) - collideX > ((this.height / 2 + object.height / 2) - collideY)) {
+                this.vector.y = directionY * (distanceY - (this.height / 2 + object.height / 2));
 
             } else {
-                this.vector.y = - (this.height/2 + object.height/2) + (this.calculateDistanceToPoint(this.center.x, object.center.y)) ;
+                this.vector.x = directionX * (distanceX - (this.width / 2 + object.width / 2));
             }
             return true;
         }
@@ -189,16 +224,21 @@ class Cow extends MovableObject {
 
     constructor(element, id, point, width, height) {
         super(element, id, point, width, height);
-        //this.boundingShpere = this.width / 2 + boundingSphere;
-        //this.state = COW_EAT;
+        this.sleepCounter = 0;
+        this.respawnPoint = Object.assign({}, point);
 
         let div = document.createElement('div');
         this.element.appendChild(div);
         this.element.id = id;
         let img = document.createElement('img');
         this.element.children[0].appendChild(img);
-        this.setState(COW_EAT);
+        this.setState(COW_MOOS);
         this.element.style.padding = 0 + 'px';
+        this.element.style.zIndex = 11;
+    }
+
+    respawn() {
+        this.moveTo(this.respawnPoint.x, this.respawnPoint.y);
     }
 
     get getSphere() {
@@ -206,40 +246,42 @@ class Cow extends MovableObject {
     }
 
     setState(state) {
-        this.state = state;
-        switch (this.state) {
-            case COW_EAT : {
-                this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_eat.gif');
-                this.moving = false;
-                break;
-            }
-            case COW_RUN : {
-                this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_run.gif');
-                this.moving = true;
-                break;
-            }
-            case COW_MOOS : {
-                this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_moos.gif');
-                this.moving = false;
-                break;
-            }
-            case COW_SLEEP : {
-                this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_sleep.gif');
-                this.moving = false;
-                break;
-            }
-            case COW_SCAT : {
-                this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_scat.gif');
-                this.moving = false;
-                break;
-            }
-            case COW_SKIP : {
-                this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_skipping.gif');
-                this.moving = false;
-                break;
-            }
-            default : {
-                break;
+        if (this.state !== state) {
+            this.state = state;
+            switch (this.state) {
+                case COW_EAT : {
+                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_eat.gif');
+                    this.moving = false;
+                    break;
+                }
+                case COW_RUN : {
+                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_run.gif');
+                    this.moving = true;
+                    break;
+                }
+                case COW_MOOS : {
+                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_moos.gif');
+                    this.moving = false;
+                    break;
+                }
+                case COW_SLEEP : {
+                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_sleep.gif');
+                    this.moving = false;
+                    break;
+                }
+                case COW_SCAT : {
+                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_scat.gif');
+                    this.moving = false;
+                    break;
+                }
+                case COW_SKIP : {
+                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_skipping.gif');
+                    this.moving = false;
+                    break;
+                }
+                default : {
+                    break;
+                }
             }
         }
     }
@@ -267,14 +309,13 @@ class Cow extends MovableObject {
         this.vector = vector;
     }
 
-    drawShpere() {
-        /*var cicle = document.getElementById('cow-cicle');
-        cicle.setAttribute('cx', this.getX - 10);
-        cicle.setAttribute('cy', this.getY - 10);
-        cicle.setAttribute('r', this.getSphere);*/
-    }
 
-    animate() {
+    inObject(object) {
+        return ((this.location.x > object.location.x) &&
+            (this.location.x + this.width < object.location.x + object.width) &&
+            (this.location.y > object.location.y) &&
+            (this.location.y + this.height < object.location.y + object.height)
+        );
 
     }
 }
@@ -282,7 +323,8 @@ class Cow extends MovableObject {
 
 window.onload = () => {
     var currentState = 0;
-    function Timer () {
+
+    function Timer() {
         var s = new Date().getTime();
         s = parseInt(s / 1000);
 
@@ -292,8 +334,21 @@ window.onload = () => {
         s -= m * 60;
         //console.log(m + ':' + s);
 
+        cows.forEach(function (item, index) {
+            if (item.state === COW_SLEEP) {
+                item.sleepCounter++;
+            }
+            if (item.sleepCounter > 15) {
+                item.respawn();
+                console.log(item.respawnPoint)
+                item.setState(COW_MOOS);
+                item.sleepCounter = 0;
+            }
 
-        if (s%5 == 0) {
+        });
+
+
+        /*if (s%5 == 0) {
             currentState++;
             if (currentState >= 5) {
                 currentState = 0;
@@ -301,7 +356,7 @@ window.onload = () => {
             cows.forEach(function (item, index) {
                 item.setState(states[currentState]);
             })
-        }
+        }*/
 
     }
 
@@ -311,23 +366,42 @@ window.onload = () => {
         Timer();
     }, 1000 / fps);
 
+
     var content = document.getElementById('content');
-    var point = new Point(300, 300)
+    var point = new Point(1200, 25)
     var cow = new Cow(content, 'cow', point, 100, 100);
     console.log(cow);
     cow.setPorition();
-    var point = new Point(700, 300)
-    //var cow2 = new Cow(content, 'cow1', point, 100, 100);
-    var cows = [cow];
+    var point = new Point(800, 300)
+    var cow2 = new Cow(content, 'cow1', point, 100, 100);
+    var cow3 = new Cow(content, 'cow3', new Point(1300,300), 100, 100);
+    var cows = [cow, cow2, cow3];
 
     var point = new Point(900, 300);
-    var wall = new BaseObject(content, 'wall', point, 10, 200);
+    var wall = new Wall(content, 'wall', point, 50, 150);
+    var point = new Point(900, 0);
+    var wall2 = new Wall(content, 'wall2', point, 50, 150);
+    var point = new Point(0, 400);
+    var wall3 = new Wall(content, 'wall3', point, 900, 50);
+
+    var point = new Point(500, 100);
+    var wall4 = new Wall(content, 'wall4', point, 10, 200);
+
+    var wall5 = new Wall(content, 'wall5', new Point(750, 110), 10, 300);
+
+    var wall6 = new Wall(content, 'wall6', new Point(0, 300), 330, 10);
+
+    var wall7 = new Wall(content, 'wall7', new Point(630, 0), 10, 280);
+
+    var walls = [wall, wall2, wall3, wall4, wall5, wall6, wall7];
+
+    var point = new Point(0, 0);
+
+    var stall = new Stall(content, 'stall', point, 500, 300)
 
     var content = document.getElementById('content');
     var contX = document.getElementById('cont-x');
     var contY = document.getElementById('cont-y');
-    //const cow = document.getElementById('cow');
-    //var myType = document.getElementsByClassName('event-type');
     var shprere = document.getElementById('cow');
     var shprere2 = document.getElementById('cow1');
     //var cow = new Cow('cow-cicle', 80);
@@ -336,10 +410,43 @@ window.onload = () => {
     content.onmouseout = handlerOut;
     content.onmousemove = handlerMove;
 
-    /*shprere2.onmouseover = handlerOver;
-    shprere2.onmouseout = handlerOut;
-    shprere2.onmousemove = handlerMove;
-    */
+    var score = 0;
+
+    //---------------------------------------
+
+    var fps = 25; // 50 кадров в секунду
+    var timer = setInterval(function () {
+
+        cows.forEach(function (item, index) {
+
+
+            walls.forEach(function (wItem, index) {
+                if (item.isCollideWith(wItem)) {
+
+                    console.log("Collide!!!");
+                    //item.setState(COW_SCAT);
+                }
+            })
+            if (item.isCollideWith(wall)) {
+
+                //item.setState(COW_SCAT);
+            }
+
+            //item.vector.prepareDirection(item.speed);
+            if (item.inObject(stall) && item.state !== COW_SLEEP) {
+                item.setState(COW_SLEEP);
+                score++;
+                document.getElementById('score').innerText = 'Total: ' + score;
+            } else {
+                item.move();
+            }
+        })
+
+
+    }, 1000 / fps);
+
+    //---------------------------------------
+
 
     var moving = false;
 
@@ -361,9 +468,6 @@ window.onload = () => {
 
         cows.forEach(function (item, index) {
 
-
-
-
             let currentCow = item;
             if (item.calculateDistanceToPoint(event.clientX, event.clientY) <= 200) {
                 item.makeDirectionFromPoint(event.clientX, event.clientY);
@@ -375,16 +479,18 @@ window.onload = () => {
                         }
                     }
                 })
+            } else {
+                if (item.state !== COW_SLEEP) {
+                    item.setState(COW_MOOS);
+                }
             }
 
             if (item.calculateDistanceToPoint(event.clientX, event.clientY) <= 200 && !item.moving) {
 
                 item.makeDirectionFromPoint(event.clientX, event.clientY);
-                //console.log(vector);
-                if (item.state !== COW_RUN)
+                if ((item.state !== COW_RUN) && (item.state !== COW_EAT) && (item.state !== COW_SLEEP))
                     item.setState(COW_RUN);
 
-                item.moving = true;
                 cows.forEach(function (item, index) {
                     if (currentCow !== item) {
                         if (currentCow.isCollideWith(item)) {
@@ -394,31 +500,9 @@ window.onload = () => {
                     }
                 })
 
-                var fps = 50; // 50 кадров в секунду
-                var timer = setInterval(function () {
-                    if (item.calculateDistanceToPoint(event.clientX, event.clientY) >= 200) {
-                        item.setState(COW_MOOS);
-                    }
-
-
-                    if (!item.moving) {
-                        clearInterval(timer);
-                    } else {
-                        if (item.isCollideWith(wall)){
-                            console.log("Collide!!!");
-                            //item.setState(COW_SCAT);
-                            //item.vector.y = 0;
-                        }
-
-                        //item.vector.prepareDirection(item.speed);
-                        item.move();
-
-
-                    }
-                }, 1000 / fps);
-            } else {
-                //item.moving = false;
-                //item.setState(COW_MOOS);
+                if (item.calculateDistanceToPoint(event.clientX, event.clientY) >= 200) {
+                    // item.setState(COW_MOOS);
+                }
             }
 
 
@@ -427,111 +511,13 @@ window.onload = () => {
             let vLength = document.getElementById('vector-length');
             vLength.innerText = Math.sqrt(item.vector.getY * item.vector.getY + item.vector.getX * item.vector.getX);
             let vectorLog = document.getElementById('lineAB');
-            vectorLog.setAttribute('d', "M 200 200 l " + item.vector.getX *20 + " " + item.vector.getY*20);
+            vectorLog.setAttribute('d', "M 200 200 l " + item.vector.getX * 20 + " " + item.vector.getY * 20);
         });
-        /*
-                 cows.forEach(function (item ,index){
-                     if ((event.fromElement === item.element) || (event.fromElement === item.element.children[0]) || (event.fromElement === item.element.children[0].children[0])){
-                         currentCow = item;
-
-
-                         vector = currentCow.makeDirectionFromPoint(event.clientX, event.clientY);
-                         currentCow.setState(COW_RUN);
-                         currentCow.moving = true;
-
-                         var fps = 20; // 50 кадров в секунду
-                         var timer = setInterval(function () {
-                             if (!currentCow.moving) {
-                                 clearInterval(timer);
-                             } else {
-
-                                 let v = vector;
-                                 let speed = 5;
-                                 /!*if (cow.isCollideWith(rock)) {
-                                 speed = 0;
-                             }
-                             v.prepareDirection(speed);
-                             currentCow.move(v);
-
-                         }
-                     }, 1000 / fps);
-
-
-                 contX.innerText = vector.getX;
-                 contY.innerText = vector.getY;
-                 let vLength = document.getElementById('vector-length');
-                 vLength.innerText = Math.sqrt(vector.getY*vector.getY+ vector.getX*vector.getX);
-                 let vectorLog = document.getElementById('lineAB');
-                 vectorLog.setAttribute('d', "M 200 200 l " + vector.getX + " " + vector.getY);
-
-             }
-        });
-        */
-
-
-        /*
-        var currentCow;
-                 cows.forEach(function (item ,index){
-                     if ((event.fromElement === item.element) || (event.fromElement === item.element.children[0]) || (event.fromElement === item.element.children[0].children[0])){
-                         currentCow = item;
-
-                         vector = currentCow.makeDirectionFromPoint(event.clientX, event.clientY);
-                         contX.innerText = vector.getX;
-                         contY.innerText = vector.getY;
-                         let vLength = document.getElementById('vector-length');
-                         vLength.innerText = Math.sqrt(vector.getY*vector.getY+ vector.getX*vector.getX);
-                         let vectorLog = document.getElementById('lineAB');
-                         vectorLog.setAttribute('d', "M 200 200 l " + vector.getX + " " + vector.getY);
-                     }
-                 });
-
-
-
-
-        */
 
     }
 
     function handlerOver(event) {
-        /*var currentCow;
-        cows.forEach(function (item ,index){
-            if ((event.fromElement === item.element) || (event.fromElement === item.element.children[0]) || (event.fromElement === item.element.children[0].children[0])){
-                currentCow = item;
 
-
-                vector = currentCow.makeDirectionFromPoint(event.clientX, event.clientY);
-                currentCow.setState(COW_RUN);
-                currentCow.moving = true;
-
-                var fps = 20; // 50 кадров в секунду
-                var timer = setInterval(function () {
-                    if (!currentCow.moving) {
-                        clearInterval(timer);
-                    } else {
-
-                        let v = vector;
-                        let speed = 5;
-                        /!*if (cow.isCollideWith(rock)) {
-                           speed = 0;
-                        }*!/
-                        v.prepareDirection(speed);
-                        currentCow.move(v);
-
-                    }
-                }, 1000 / fps)
-
-
-                contX.innerText = vector.getX;
-                contY.innerText = vector.getY;
-                let vLength = document.getElementById('vector-length');
-                vLength.innerText = Math.sqrt(vector.getY*vector.getY+ vector.getX*vector.getX);
-                let vectorLog = document.getElementById('lineAB');
-                vectorLog.setAttribute('d', "M 200 200 l " + vector.getX + " " + vector.getY);
-
-            }
-        });
-
-*/
         return false;
     }
 }
