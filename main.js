@@ -1,5 +1,11 @@
 "use strict";
 
+
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
 class Point {
     constructor(x, y) {
         this.x = x;
@@ -62,19 +68,22 @@ class BaseObject {
     constructor(container, id, point, width, height) {
         this.container = container;
         this.width = width;
-
+        this.id = id;
         this.height = height;
         this.location = point;
 
-        let center = new Point(point.getX + width / 2, point.getY + height / 2)
-        this.center = center;
+        this.center = new Point(point.getX + width / 2, point.getY + height / 2);
 
+
+    }
+
+    draw() {
         this.element = document.createElement('div');
-        this.element.style.width = width + 'px';
-        this.element.style.height = height + 'px';
-        container.appendChild(this.element);
+        this.element.style.width = this.width + 'px';
+        this.element.style.height = this.height + 'px';
+        this.container.appendChild(this.element);
         this.element.className = 'obj';
-        this.element.id = id;
+        this.element.id = this.id;
         this.setPorition();
     }
 
@@ -110,6 +119,11 @@ class BaseObject {
 class Wall extends BaseObject {
     constructor(element, id, point, width, height) {
         super(element, id, point, width, height);
+
+    }
+
+    draw() {
+        super.draw();
         this.element.style.background = 'black';
     }
 }
@@ -118,6 +132,10 @@ class Wall extends BaseObject {
 class Stall extends BaseObject {
     constructor(element, id, point, width, height) {
         super(element, id, point, width, height);
+    }
+
+    draw() {
+        super.draw();
         this.element.style.background = 'grey';
     }
 }
@@ -127,7 +145,7 @@ class MovableObject extends BaseObject {
     constructor(element, id, point, width, height) {
         super(element, id, point, width, height);
         this.moving = false;
-        this.speed = 6;
+        this.speed = 10;
         this.vector = new Vector(0, 0)
     }
 
@@ -136,14 +154,23 @@ class MovableObject extends BaseObject {
             let vector = this.vector;
             this.location.setCoord = [this.getX + vector.getX, this.getY + vector.getY];
             this.center.setCoord = [this.getX + this.width / 2, this.getY + this.height / 2];
+
             if (this.getX < 0) this.location.x = 0;
             if (this.getY < 0) this.location.y = 0;
-
             if (this.getX > this.container.clientWidth - this.width / 2) this.location.x = this.container.clientWidth - this.width / 2;
             if (this.getY > this.container.clientHeight - this.height / 2) this.location.y = this.container.clientHeight - this.height / 2;
+
             this.element.style.top = (this.getY) + 'px';
             this.element.style.left = (this.getX) + 'px';
         }
+    }
+
+    makeDirectionToPoint(x, y) {
+        let v = new Vector(x - this.center.x, y - this.center.y);
+        v.normalize();
+        v.multiplicate(this.speed);
+        this.vector = v;
+        return false;
     }
 
     moveTo(x, y) {
@@ -204,6 +231,50 @@ class MovableObject extends BaseObject {
     }
 }
 
+const IS_OPENED = 'open';
+const IS_CLOSED = 'close';
+
+class Gates extends MovableObject{
+
+    constructor(element, id, point, width, height) {
+        super(element, id, point, width, height);
+        this.isOpened = true;
+        this.openTimer = 0;
+        this.maxTimer = 20;
+        this.destinationPoint = new Point(0,0);
+    }
+
+
+    draw() {
+        super.draw();
+        this.element.style.background = 'black';
+    }
+
+    ready() {
+        if (this.isOpened) {
+            this.destinationPoint = new Point(this.center.x, this.center.y + this.height );
+            this.isOpened = false;
+        } else {
+            this.destinationPoint = new Point(this.center.x, this.center.y - this.height );
+            this.isOpened = true;
+        }
+    }
+
+    doThing() {
+        this.makeDirectionToPoint(this.destinationPoint.x, this.destinationPoint.y);
+        this.move();
+
+    }
+
+    getDirection(){
+
+    }
+
+    up() {
+
+    }
+
+}
 
 const COW_EAT = 'eat';
 const COW_RUN = 'run';
@@ -211,30 +282,35 @@ const COW_MOOS = 'moos';
 const COW_SLEEP = 'sleep';
 const COW_SCAT = 'scat';
 const COW_SKIP = 'skip';
+const DIRECTION_LEFT = 'left';
+const DIRECTION_RIGHT = 'right';
 
 var states = [
-    COW_SLEEP,
+    COW_SCAT,
     COW_MOOS,
     COW_EAT,
-    COW_SCAT,
-    COW_SKIP
 ]
 
 class Cow extends MovableObject {
 
     constructor(element, id, point, width, height) {
         super(element, id, point, width, height);
-        this.sleepCounter = 0;
+        this.sleepTimer = 0;
+        this.eatTimer = 0;
+        this.currentState = getRandomInt(0, states.length);
         this.respawnPoint = Object.assign({}, point);
+        this.imageDirection = DIRECTION_RIGHT;
+    }
 
-        let div = document.createElement('div');
-        this.element.appendChild(div);
-        this.element.id = id;
+    draw() {
+        super.draw();
+        this.element.id = this.id;
         let img = document.createElement('img');
-        this.element.children[0].appendChild(img);
-        this.setState(COW_MOOS);
+        this.element.appendChild(img);
+        this.setState(states[this.currentState]);
         this.element.style.padding = 0 + 'px';
         this.element.style.zIndex = 11;
+
     }
 
     respawn() {
@@ -250,33 +326,41 @@ class Cow extends MovableObject {
             this.state = state;
             switch (this.state) {
                 case COW_EAT : {
-                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_eat.gif');
+                    this.setImage('i/mm_cow_eat.gif');
                     this.moving = false;
+                    this.isAvailable = false;
+                    this.sleepTimer = 0;
                     break;
                 }
                 case COW_RUN : {
-                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_run.gif');
+                    this.setImage('i/mm_cow_run.gif');
                     this.moving = true;
+                    this.isAvailable = true;
                     break;
                 }
                 case COW_MOOS : {
-                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_moos.gif');
+                    this.setImage('i/mm_cow_moos.gif');
                     this.moving = false;
+                    this.isAvailable = true;
+                    this.eatTimer = 0;
                     break;
                 }
                 case COW_SLEEP : {
-                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_sleep.gif');
+                    this.setImage('i/mm_cow_sleep.gif');
                     this.moving = false;
+                    this.isAvailable = false;
                     break;
                 }
                 case COW_SCAT : {
-                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_scat.gif');
+                    this.setImage('i/mm_cow_scat.gif');
                     this.moving = false;
+                    this.isAvailable = true;
                     break;
                 }
                 case COW_SKIP : {
-                    this.element.children[0].children[0].setAttribute('src', 'i/mm_cow_skipping.gif');
+                    this.setImage('i/mm_cow_skipping.gif');
                     this.moving = false;
+                    this.isAvailable = true;
                     break;
                 }
                 default : {
@@ -284,6 +368,28 @@ class Cow extends MovableObject {
                 }
             }
         }
+    }
+
+
+    nextRandomState() {
+        this.currentState = getRandomInt(0, states.length);
+        if (this.currentState > states.length) {
+            this.currentState = 0;
+        }
+        this.setState(states[this.currentState]);
+    }
+
+    nextState() {
+        this.currentState++;
+        if (this.currentState >= states.length + 1) {
+            this.currentState = 0;
+        }
+        this.setState(states[this.currentState]);
+    }
+
+
+    setImage(path) {
+        this.element.children[0].setAttribute('src', path);
     }
 
     calculateDistanceToPoint(x, y) {
@@ -295,7 +401,30 @@ class Cow extends MovableObject {
         v.normalize();
         v.multiplicate(this.speed);
         this.vector = v;
+        this.checkDirection();
         return false;
+    }
+
+    makeDirectionToPoint(x, y) {
+        let v = new Vector(x - this.center.x, y - this.center.y);
+        v.normalize();
+        v.multiplicate(this.speed);
+        this.vector = v;
+        this.checkDirection();
+        return false;
+    }
+
+    checkDirection() {
+        if (this.isAvailable) {
+            if (this.vector.getX < 0 && this.imageDirection !== DIRECTION_LEFT) {
+                this.imageDirection = DIRECTION_LEFT;
+                this.element.children[0].className = 'left';
+            }
+            if (this.vector.getX > 0 && this.imageDirection !== DIRECTION_RIGHT) {
+                this.imageDirection = DIRECTION_RIGHT;
+                this.element.children[0].className = '';
+            }
+        }
     }
 
     calculateVectorFromPoint(x, y) {
@@ -321,9 +450,118 @@ class Cow extends MovableObject {
 }
 
 
+var content = document.getElementById('content');
+var contX = document.getElementById('cont-x');
+var contY = document.getElementById('cont-y');
+
+let contentX = content.clientWidth;
+let contentY = content.clientHeight;
+
+var wall = new Wall(content, 'wall', new Point(900, 300), 5, 150);
+var wall2 = new Wall(content, 'wall2', new Point(900, 0), 5, 150);
+var wall3 = new Wall(content, 'wall3', new Point(0, 400), 900, 5);
+var wall4 = new Wall(content, 'wall4', new Point(500, 100), 5, 200);
+var wall5 = new Wall(content, 'wall5', new Point(750, 110), 5, 300);
+var wall6 = new Wall(content, 'wall6', new Point(0, 300), 330, 5);
+var wall7 = new Wall(content, 'wall7', new Point(630, 0), 5, 280);
+let wallHeight =  (contentY -240) /3;
+let gateHeight = 120;
+var wall8 = new Wall(content, 'wall8', new Point(contentX - 120, 0), 5, wallHeight);
+var wall9 = new Wall(content, 'wall9', new Point(contentX - 120, wallHeight + gateHeight), 5, wallHeight);
+var wall10 = new Wall(content, 'wall10', new Point(contentX - 120, wallHeight*2 + gateHeight*2), 5, wallHeight);
+var gate = new Gates(content, 'gate', new Point(contentX - 125, wallHeight - gateHeight), 5, gateHeight);
+var gate2 = new Gates(content, 'gate2', new Point(contentX - 125, wallHeight*2 ), 5, gateHeight);
+gate.draw();
+console.log(gate);
+gate2.draw();
+
+
+var walls = [wall, wall2, wall3, wall4, wall5, wall6, wall7, wall8, wall9, wall10 ];
+
+
+
+var stall = new Stall(content, 'stall', new Point(0, 0), 500, 300);
+var stall2 = new Stall(content, 'stall2', new Point(contentX-115, 0), 120, contentY);
+
+var stalls = [stall, stall2];
+
+var cows = [];
+
+
+function generateCow(id) {
+    let maxX =content.clientWidth - 50;
+    let maxY =content.clientHeight - 50;
+    let flag = false;
+    let cow;
+    while (!flag) {
+        flag = true;
+        let randX = getRandomInt(0, maxX);
+        let randY = getRandomInt(0, maxY);
+        cow = new Cow(content, id, new Point(randX, randY), 100, 100);
+        walls.forEach((item) => {
+            if (cow.isCollideWith(item)) {
+                flag = false;
+            }
+
+        });
+
+        cows.forEach((item) => {
+            if (cow.isCollideWith(item)) {
+                flag = false;
+            }
+
+        });
+
+        stalls.forEach((item) => {
+            if (cow.isCollideWith(item)) {
+                flag = false;
+            }
+
+        });
+
+
+    }
+    return cow;
+}
+
+
 window.onload = () => {
+
+    walls.forEach((wall) => {
+        wall.draw();
+    });
+
+    stall.draw();
+    stall2.draw();
+
+    var fps = 1; // 50 кадров в секунду
+    var timer = setInterval(function () {
+        Timer();
+    }, 1000 / fps);
+
+
+    var content = document.getElementById('content');
+
+    for (var i = 0; i <20; i++) {
+        let cow = generateCow('cow-' + i);
+        cow.draw();
+        cows.push(cow);
+    }
+
+
+
+
+    content.onmouseover = handlerOver;
+    content.onmouseout = handlerOut;
+    content.onmousemove = handlerMove;
+
+
+    var score = 0;
+
+
     var currentState = 0;
 
+//------------------------------------------------
     function Timer() {
         var s = new Date().getTime();
         s = parseInt(s / 1000);
@@ -336,81 +574,39 @@ window.onload = () => {
 
         cows.forEach(function (item, index) {
             if (item.state === COW_SLEEP) {
-                item.sleepCounter++;
+                item.sleepTimer++;
             }
-            if (item.sleepCounter > 15) {
+
+            if (item.state === COW_EAT) {
+                item.eatTimer++;
+            }
+            if (item.sleepTimer > 15) {
                 item.respawn();
-                console.log(item.respawnPoint)
-                item.setState(COW_MOOS);
-                item.sleepCounter = 0;
+                item.setState(COW_EAT);
+            }
+
+            if (item.eatTimer > 5) {
+                item.setState(COW_SCAT);
             }
 
         });
 
 
-        /*if (s%5 == 0) {
-            currentState++;
-            if (currentState >= 5) {
-                currentState = 0;
-            }
+        if (s % 5 == 0) {
+            gate.ready();
+            console.log(gate);
+            gate.moving = true;
+        }
+
+        if (s % 5 == 0) {
             cows.forEach(function (item, index) {
-                item.setState(states[currentState]);
+                if (item.isAvailable && !item.moving) {
+                    item.nextRandomState();
+                }
             })
-        }*/
+        }
 
     }
-
-
-    var fps = 1; // 50 кадров в секунду
-    var timer = setInterval(function () {
-        Timer();
-    }, 1000 / fps);
-
-
-    var content = document.getElementById('content');
-    var point = new Point(1200, 25)
-    var cow = new Cow(content, 'cow', point, 100, 100);
-    console.log(cow);
-    cow.setPorition();
-    var point = new Point(800, 300)
-    var cow2 = new Cow(content, 'cow1', point, 100, 100);
-    var cow3 = new Cow(content, 'cow3', new Point(1300,300), 100, 100);
-    var cows = [cow, cow2, cow3];
-
-    var point = new Point(900, 300);
-    var wall = new Wall(content, 'wall', point, 50, 150);
-    var point = new Point(900, 0);
-    var wall2 = new Wall(content, 'wall2', point, 50, 150);
-    var point = new Point(0, 400);
-    var wall3 = new Wall(content, 'wall3', point, 900, 50);
-
-    var point = new Point(500, 100);
-    var wall4 = new Wall(content, 'wall4', point, 10, 200);
-
-    var wall5 = new Wall(content, 'wall5', new Point(750, 110), 10, 300);
-
-    var wall6 = new Wall(content, 'wall6', new Point(0, 300), 330, 10);
-
-    var wall7 = new Wall(content, 'wall7', new Point(630, 0), 10, 280);
-
-    var walls = [wall, wall2, wall3, wall4, wall5, wall6, wall7];
-
-    var point = new Point(0, 0);
-
-    var stall = new Stall(content, 'stall', point, 500, 300)
-
-    var content = document.getElementById('content');
-    var contX = document.getElementById('cont-x');
-    var contY = document.getElementById('cont-y');
-    var shprere = document.getElementById('cow');
-    var shprere2 = document.getElementById('cow1');
-    //var cow = new Cow('cow-cicle', 80);
-    //var rock = new BaseObject('rock');
-    content.onmouseover = handlerOver;
-    content.onmouseout = handlerOut;
-    content.onmousemove = handlerMove;
-
-    var score = 0;
 
     //---------------------------------------
 
@@ -433,7 +629,14 @@ window.onload = () => {
             }
 
             //item.vector.prepareDirection(item.speed);
-            if (item.inObject(stall) && item.state !== COW_SLEEP) {
+            let inStall = false;
+            stalls.forEach((stall) => {
+                if (item.inObject(stall) && item.state !== COW_SLEEP) {
+                    inStall = true;
+                }
+            })
+
+            if (inStall) {
                 item.setState(COW_SLEEP);
                 score++;
                 document.getElementById('score').innerText = 'Total: ' + score;
@@ -441,7 +644,7 @@ window.onload = () => {
                 item.move();
             }
         })
-
+       gate.doThing();
 
     }, 1000 / fps);
 
@@ -454,14 +657,13 @@ window.onload = () => {
     var vector = new Vector();
 
     function handlerOut(event) {
-
-        cows.forEach(function (item, index) {
-            //item.setState(COW_EAT);
-            if ((event.fromElement === item.element) || (event.fromElement === item.element.children[0]) || (event.fromElement === item.element.children[0].children[0])) {
-                //item.moving = false;
-                //item.setState(COW_EAT);
-            }
-        });
+        /*
+                cows.forEach(function (item, index) {
+                    //item.setState(COW_EAT);
+                    if ((event.fromElement === item.element) || (event.fromElement === item.element.children[0]) || (event.fromElement === item.element.children[0].children[0])) {
+                        //item.setState(COW_EAT);
+                    }
+                });*/
     }
 
     function handlerMove(event) {
@@ -480,7 +682,7 @@ window.onload = () => {
                     }
                 })
             } else {
-                if (item.state !== COW_SLEEP) {
+                if (item.isAvailable) {
                     item.setState(COW_MOOS);
                 }
             }
@@ -488,7 +690,7 @@ window.onload = () => {
             if (item.calculateDistanceToPoint(event.clientX, event.clientY) <= 200 && !item.moving) {
 
                 item.makeDirectionFromPoint(event.clientX, event.clientY);
-                if ((item.state !== COW_RUN) && (item.state !== COW_EAT) && (item.state !== COW_SLEEP))
+                if (item.isAvailable)
                     item.setState(COW_RUN);
 
                 cows.forEach(function (item, index) {
@@ -499,10 +701,6 @@ window.onload = () => {
                         }
                     }
                 })
-
-                if (item.calculateDistanceToPoint(event.clientX, event.clientY) >= 200) {
-                    // item.setState(COW_MOOS);
-                }
             }
 
 

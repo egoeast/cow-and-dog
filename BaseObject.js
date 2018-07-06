@@ -1,29 +1,29 @@
-export class BaseObject {
+class BaseObject {
 
     constructor(container, id, point, width, height) {
-        /*  this.element = document.getElementById(element);
-          let params = this.element.getBoundingClientRect();*/
+        this.container = container;
         this.width = width;
+        this.id = id;
         this.height = height;
         this.location = point;
 
-        let center = new Point(point.getX + width / 2, point.getY + height / 2)
-        this.center = center;
-
-        this.element = document.createElement('div');
-        container.appendChild(this.element);
-        this.element.className = 'obj';
-        this.setPorition();
-        /*this.element.style.width='200px';
-
-        this.element.style.height='100px';
-
-        this.element.style.background='gray';*/
+        this.center = new Point(point.getX + width / 2, point.getY + height / 2);
 
 
     }
 
+    draw() {
+        this.element = document.createElement('div');
+        this.element.style.width = this.width + 'px';
+        this.element.style.height = this.height + 'px';
+        this.container.appendChild(this.element);
+        this.element.className = 'obj';
+        this.element.id = this.id;
+        this.setPorition();
+    }
+
     setPorition() {
+        this.center = new Point(this.location.getX + this.width / 2, this.location.getY + this.height / 2)
         this.element.style.top = this.location.getY + 'px';
         this.element.style.left = this.location.getX + 'px';
     }
@@ -49,12 +49,4 @@ export class BaseObject {
 
     }
 
-    /*  calculatePositionIn(event) {
-          let x = event.clientX - this.x;
-          let y = event.clientY - this.y;
-          return [x, y];
-      }
-  */
-
 }
-

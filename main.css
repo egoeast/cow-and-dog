@@ -48,8 +48,8 @@
 }
 
 #content {
-    width: 1500px;
-    height: 500px;
+    width: 2000px;
+    height: 1000px;
     background: aliceblue;
    /* cursor: url('i/mm_dog_barks.gif'), pointer;*/
 }
@@ -94,4 +94,13 @@
     height: 20px;
     width: 50px;
     z-index: 11;
+}
+
+
+.left {
+    -moz-transform: scale(-1, 1);
+    -ms-transform: scale(-1, 1);
+    -webkit-transform: scale(-1, 1);
+    -o-transform: scale(-1, 1);
+    transform: scale(-1, 1);
 }
