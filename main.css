@@ -1,6 +1,6 @@
 .obj {
     position: absolute;
-    /*background: green;*/
+   /* background: green;*/
 }
 
 .obj img{
@@ -51,7 +51,19 @@
     width: 2000px;
     height: 1000px;
     background: aliceblue;
-   /* cursor: url('i/mm_dog_barks.gif'), pointer;*/
+    /*cursor: url('i/mm_dog_sit.gif'), pointer;*/
+}
+
+.dog-bark {
+    cursor: move;
+}
+
+.dog-run {
+    cursor: cell;
+}
+
+.dog-sit {
+    cursor: pointer;
 }
 
 #next {
