@@ -7,98 +7,32 @@
     border-radius: 50px;
 }
 
-#rock{
-    background: darkgrey;
-    height: 100px;
-    width: 100px;
-    top: 150px;
-    left: 150px;
-    position: absolute;
-}
-#cow {
-    height: 100px;
-    width: 100px;
-   /* position: absolute;
-    top: 150px;
-    left: 150px;
-   */ /*background-image: url('i/cow_step-1_moos.png');*/
-    z-index: 11;
-}
-
-#cow1 {
-    height: 100px;
-    width: 100px;
-    /* position: absolute;
-     top: 150px;
-     left: 150px;
-    */ /*background-image: url('i/cow_step-1_moos.png');*/
-    z-index: 11;
-}
-
-#cow-cicle {
-    /*height: 150px;
-    width: 150px;*/
-    padding: 50px;
-    position: absolute;
-    top: 550px;
-    left: 150px;
-    /*z-index: 10;*/
-    background: red;
-    z-index: 11;
-}
-
 #content {
     width: 2000px;
     height: 1000px;
     background: aliceblue;
-    /*cursor: url('i/mm_dog_sit.gif'), pointer;*/
+
 }
 
 .dog-bark {
-    cursor: move;
+    /*cursor: move;*/
+    cursor: url('i/dog_step-5-barks.svg'), pointer;
 }
 
 .dog-run {
-    cursor: cell;
+    /*cursor: cell;*/
+    cursor: url('i/dog_step-5-run.svg'), pointer;
 }
 
 .dog-sit {
-    cursor: pointer;
-}
-
-#next {
-    width: 500px;
-    height: 500px;
-    background: red;
+    /*cursor: pointer;*/
+    cursor: url('i/dog_step-4-sit.svg'), pointer;
 }
 
 #wall {
-    background: black;
-    width: 50px;
-    height: 150px;
+    cursor: pointer;
 }
 
-#wall2 {
-    background: black;
-    width: 50px;
-    height: 150px;
-}
-
-#wall3 {
-    background: black;
-    width: 900px;
-    height: 50px;
-}
-
-#wall4 {
-    background: black;
-
-}
-
-#stall {
-
-    z-index: 2;
-}
 
 #score {
     position: absolute;
