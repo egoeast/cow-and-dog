@@ -6,6 +6,7 @@ import {Stall} from "./Stall";
 import {Gates} from "./Gates";
 import {Cow} from "./Cow";
 import {Dog} from "./Dog";
+import {ARRIVED} from "./MovableObject";
 
 const FPS = 25;
 const DISTANTION_TO_DOG = 200;
@@ -65,7 +66,7 @@ let stall2 = new Stall(content, 'stall-2', new Point(contentX - 115, 0), 120, co
 
 let gates = [gate, gate2, gate3, gate4];
 let walls = [
-    wall,
+//    wall,
     wall2,wall3, wall4,
     //wall, wall2, wall3, wall4, wall5, wall6, wall7,
     wall8, wall9, wall10];
@@ -130,10 +131,8 @@ window.onload = () => {
         let cow = generateCow('cow-' + i);
         cows.push(cow);
     }
-/*
     let cow = new Cow(content, 'cow', new Point(300, 300), 100, 100);
     cows.push(cow);
-*/
 
 
     /********************************************
@@ -155,9 +154,6 @@ window.onload = () => {
     cows.forEach((cow) => {
         cow.draw();
     });
-
-
-
 
     /********************************************
      * Таймер для управления состояниями объектов
@@ -222,14 +218,34 @@ window.onload = () => {
                 }
             });
 
-            if (inStall && cow.isAvailable) {
-                cow.sleep();
-
+            /*if (inStall && cow.isOnRoute()) {
+                //cow.sleep();
+                cow.addPointToRoute(new Point(50, 100));
+                cow.moveOnRoute();
+                cow.available = false;
+                score++;
+                document.getElementById('score').innerText = 'Total: ' + score;
+            }*/
+            if (inStall && !cow.isOnRoute() && !cow.isSleeping()) {
+                //cow.sleep();
+                cow.addPointToRoute(new Point(50, 100));
+                cow.moveOnRoute();
+                cow.run();
                 cow.available = false;
                 score++;
                 document.getElementById('score').innerText = 'Total: ' + score;
             }
+
+           /* if (inStall && cow.isArrived() && !cow.isSleeping()) {
+                alert(true);
+                cow.sleep();
+            }*/
             cow.doStaff();
+            if (cow.isArrived() && !cow.isSleeping()) {
+                alert(true);
+                cow.sleep();
+                cow.stand();
+            }
 
         });
 

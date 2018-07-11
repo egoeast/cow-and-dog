@@ -82,6 +82,7 @@ export class MovableObject extends BaseObject {
             this.vector = tempV;
             this.moving = false;
             this.route.shift();
+            this.movingStatus = ARRIVED;
         } else {
             this.vector = v;
         }
@@ -151,6 +152,18 @@ export class MovableObject extends BaseObject {
 
     moveOnRoute() {
         this.movingStatus = ON_ROUTE;
+    }
+
+    isOnRoute() {
+        return this.movingStatus === ON_ROUTE;
+    }
+
+    isArrived() {
+        return this.movingStatus === ARRIVED;
+    }
+
+    stand() {
+        this.movingStatus = STAND;
     }
 
 }

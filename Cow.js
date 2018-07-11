@@ -232,7 +232,7 @@ export class Cow extends MovableObject {
         }
 
         if (this.sleepTimer > SLEEP_TIME) {
-            //this.sleepTimer = 0;
+            this.sleepTimer = 0;
             this.respawn();
            // this.addPointToRoute(new Point(1950,310));
             //  this.addPointToRoute(this.respawnPoint);
@@ -249,13 +249,11 @@ export class Cow extends MovableObject {
     }
 
     doStaff() {
-        //if (this.movingStatus === ON_ROUTE) {
-           // this.makeVectorToDestination();
-        //}
-        this.move();
-        if (this.movingStatus === ARRIVED) {
-            alert(ARRIVED);
-            this.setCurrentState();
+        if (this.movingStatus === ON_ROUTE) {
+            this.moving = true;
+           this.makeVectorToDestination();
         }
+        this.move();
+
     }
 }
