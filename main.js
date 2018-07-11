@@ -65,7 +65,8 @@ let stall2 = new Stall(content, 'stall-2', new Point(contentX - 115, 0), 120, co
 
 let gates = [gate, gate2, gate3, gate4];
 let walls = [
-    wall, wall2,wall3, wall4,
+    wall,
+    wall2,wall3, wall4,
     //wall, wall2, wall3, wall4, wall5, wall6, wall7,
     wall8, wall9, wall10];
 let stalls = [
@@ -125,11 +126,15 @@ window.onload = () => {
 
 
     content.onmousemove = handlerMove;
-
     for (let i = 0; i < 10; i++) {
         let cow = generateCow('cow-' + i);
         cows.push(cow);
     }
+/*
+    let cow = new Cow(content, 'cow', new Point(300, 300), 100, 100);
+    cows.push(cow);
+*/
+
 
     /********************************************
      * Прорисовка всех объектов
@@ -155,8 +160,6 @@ window.onload = () => {
 
 
     /********************************************
-
-    /********************************************
      * Таймер для управления состояниями объектов
      ********************************************/
 
@@ -179,7 +182,6 @@ window.onload = () => {
             dog.sit();
         }
         dog.incTimer();
-        console.log(dog.timer);
 
     }, 1000 );
 
@@ -222,12 +224,12 @@ window.onload = () => {
 
             if (inStall && cow.isAvailable) {
                 cow.sleep();
-                //cow.addPointToRoute(new Point(1950,51));
+
+                cow.available = false;
                 score++;
-                //console.log(cow);
                 document.getElementById('score').innerText = 'Total: ' + score;
             }
-            cow.move();
+            cow.doStaff();
 
         });
 
@@ -266,7 +268,6 @@ window.onload = () => {
 
         }
 
-
     }
 };
 
@@ -278,3 +279,5 @@ function displayVector(cow) {
     let vectorLog = document.getElementById('lineAB');
     vectorLog.setAttribute('d', "M 200 200 l " + cow.vector.getX * 20 + " " + cow.vector.getY * 20);
 }
+
+content.onclick = () => {console.log(cows)};

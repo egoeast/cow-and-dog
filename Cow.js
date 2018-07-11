@@ -1,4 +1,4 @@
-import {MovableObject} from "./MovableObject";
+import {ARRIVED, MovableObject, ON_ROUTE} from "./MovableObject";
 import {getRandomInt, Point, Vector} from "./Helpers";
 import {
     STATES,
@@ -44,6 +44,7 @@ export class Cow extends MovableObject {
     }
 
     setState(state) {
+
         if (this.state !== state) {
             this.state = state;
             switch (this.state) {
@@ -58,6 +59,8 @@ export class Cow extends MovableObject {
                     this.setImage('i/mm_cow_run.gif');
                     this.moving = true;
                     this.isAvailable = true;
+                    this.sleepTimer = 0;
+                    this.eatTimer = 0;
                     break;
                 }
                 case COW_MOOS : {
@@ -65,24 +68,30 @@ export class Cow extends MovableObject {
                     this.moving = false;
                     this.isAvailable = true;
                     this.eatTimer = 0;
+                    this.sleepTimer = 0;
                     break;
                 }
                 case COW_SLEEP : {
                     this.setImage('i/mm_cow_sleep.gif');
                     this.moving = false;
                     this.isAvailable = false;
+                    this.eatTimer = 0;
                     break;
                 }
                 case COW_SCAT : {
                     this.setImage('i/mm_cow_scat.gif');
                     this.moving = false;
                     this.isAvailable = true;
+                    this.eatTimer = 0;
+                    this.sleepTimer = 0;
                     break;
                 }
                 case COW_SKIP : {
                     this.setImage('i/mm_cow_skipping.gif');
                     this.moving = false;
                     this.isAvailable = true;
+                    this.eatTimer = 0;
+                    this.sleepTimer = 0;
                     break;
                 }
                 default : {
@@ -198,7 +207,9 @@ export class Cow extends MovableObject {
     }
 
     scat() {
-        this.setState(COW_SCAT);
+        if (!this.isSleeping()) {
+            this.setState(COW_SCAT);
+        }
     }
 
     moos() {
@@ -208,6 +219,10 @@ export class Cow extends MovableObject {
     };
 
     manageStates(seconds) {
+        if (!this.moving) {
+            this.setCurrentState();
+        }
+
         if (this.isSleeping()) {
             this.sleepTimer++;
         }
@@ -217,6 +232,7 @@ export class Cow extends MovableObject {
         }
 
         if (this.sleepTimer > SLEEP_TIME) {
+            //this.sleepTimer = 0;
             this.respawn();
            // this.addPointToRoute(new Point(1950,310));
             //  this.addPointToRoute(this.respawnPoint);
@@ -229,6 +245,17 @@ export class Cow extends MovableObject {
 
         if (seconds % STATE_TIME === 0 && this.isAvailable && !this.moving) {
             this.nextRandomState();
+        }
+    }
+
+    doStaff() {
+        //if (this.movingStatus === ON_ROUTE) {
+           // this.makeVectorToDestination();
+        //}
+        this.move();
+        if (this.movingStatus === ARRIVED) {
+            alert(ARRIVED);
+            this.setCurrentState();
         }
     }
 }

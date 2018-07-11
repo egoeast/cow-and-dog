@@ -1,6 +1,10 @@
 import {BaseObject} from "./BaseObject";
 import {Vector} from "./Helpers";
 
+export const STAND = 'stand';
+export const ARRIVED = 'arrived';
+export const ON_ROUTE = 'on route';
+
 export class MovableObject extends BaseObject {
 
     constructor(element, id, point, width, height) {
@@ -9,9 +13,10 @@ export class MovableObject extends BaseObject {
         this.speed = 9;
         this.vector = new Vector(0, 0)
         this.route = [];
+        this.movingStatus = STAND;
     }
 
-    moveToPoint () {
+    moveToPoint() {
         if (this.moving) {
             this.makeVectorToDestination();
             let vector = this.vector;
@@ -31,6 +36,10 @@ export class MovableObject extends BaseObject {
 
     move() {
         if (this.moving) {
+
+            if (this.route.length!==0) {
+                //let v  = new Vector()
+            }
             let vector = this.vector;
             this.location.setCoord = [this.getX + vector.getX, this.getY + vector.getY];
             this.center.setCoord = [this.getX + this.width / 2, this.getY + this.height / 2];
@@ -140,11 +149,8 @@ export class MovableObject extends BaseObject {
         this.vector.addVector(vector);
     }
 
-    doStaff() {
-        if (this.route.length !== 0)
-        {
-            this.moving = true;
-        this.makeVectorToDestination();}
+    moveOnRoute() {
+        this.movingStatus = ON_ROUTE;
     }
 
 }
