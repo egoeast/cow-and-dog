@@ -7,6 +7,6 @@ export class Stall extends BaseObject {
 
     draw() {
         super.draw();
-        //this.element.style.background = 'grey';
+        /*this.element.style.background = 'grey';*/
     }
 }

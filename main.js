@@ -61,18 +61,23 @@ let gate4 = new Gates(content, 'gate-4', new Point(115, wallHeight * 2), 10, gat
 gate.openTimer = 12;
 gate3.openTimer = 7;
 
-let stall = new Stall(content, 'stall', new Point(0, 0), 120, contentY);
-let stall2 = new Stall(content, 'stall-2', new Point(contentX - 115, 0), 120, contentY);
+let stall = new Stall(content, 'stall', new Point(0, 0), 120, contentY /2);
+let stall2 = new Stall(content, 'stall-2', new Point(0, contentY /2), 120, contentY);
+let stall3 = new Stall(content, 'stall-3', new Point(contentX - 115, 0), 120, contentY / 2);
+let stall4 = new Stall(content, 'stall-4', new Point(contentX - 115, contentY /2), 120, contentY);
 
 let gates = [gate, gate2, gate3, gate4];
 let walls = [
-//    wall,
+   wall,
     wall2,wall3, wall4,
     //wall, wall2, wall3, wall4, wall5, wall6, wall7,
     wall8, wall9, wall10];
 let stalls = [
     stall,
-    stall2];
+    stall2,
+    stall3,
+    stall4,
+];
 let cows = [];
 
 let score = 0;
@@ -131,9 +136,9 @@ window.onload = () => {
         let cow = generateCow('cow-' + i);
         cows.push(cow);
     }
-    let cow = new Cow(content, 'cow', new Point(300, 300), 100, 100);
+  /*  let cow = new Cow(content, 'cow', new Point(300, 300), 100, 100);
     cows.push(cow);
-
+*/
 
     /********************************************
      * Прорисовка всех объектов
@@ -212,9 +217,11 @@ window.onload = () => {
             });
 
             let inStall = false;
+            let inStallPoint;
             stalls.forEach((stall) => {
                 if (cow.inObject(stall) ) {
                     inStall = true;
+                    inStallPoint = new Point(stall.location.x + 60, stall.location.y + 60);
                 }
             });
 
@@ -228,7 +235,7 @@ window.onload = () => {
             }*/
             if (inStall && !cow.isOnRoute() && !cow.isSleeping()) {
                 //cow.sleep();
-                cow.addPointToRoute(new Point(50, 100));
+                cow.addPointToRoute(inStallPoint);
                 cow.moveOnRoute();
                 cow.run();
                 cow.available = false;
@@ -242,7 +249,7 @@ window.onload = () => {
             }*/
             cow.doStaff();
             if (cow.isArrived() && !cow.isSleeping()) {
-                alert(true);
+                alert('+1 bone!');
                 cow.sleep();
                 cow.stand();
             }

@@ -50,3 +50,18 @@
     -o-transform: scale(-1, 1);
     transform: scale(-1, 1);
 }
+/*
+#stall {
+    background: white;
+}
+
+#stall-2 {
+    background: black;
+}
+#stall-3 {
+    background: grey;
+}
+#stall-4 {
+    background: red;
+}
+*/
