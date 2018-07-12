@@ -3,17 +3,18 @@
 import {Point, getRandomInt} from "./Helpers";
 import {Wall} from "./Wall";
 import {Stall} from "./Stall";
-import {Gates} from "./Gates";
 import {Cow} from "./Cow";
 import {Dog} from "./Dog";
-import {ARRIVED} from "./MovableObject";
+import {COW_RUN, SLEEP_TIME} from "./constants";
 
-const FPS = 25;
+const FPS = 60;
 const DISTANTION_TO_DOG = 200;
 
 let content = document.getElementById('content');
 
-let dog = new Dog(content);
+let dog = new Dog(content, 'dog', new Point(300, 300), 60, 60);
+console.log(dog)
+dog.draw();
 
 var scrollHeight = Math.max(
     document.body.scrollHeight, document.documentElement.scrollHeight,
@@ -22,8 +23,8 @@ var scrollHeight = Math.max(
 );
 
 
-content.style.height = scrollHeight - 50 +'px';
-content.style.width = document.body.clientWidth+'px';
+content.style.height = scrollHeight - 50 + 'px';
+content.style.width = document.body.clientWidth + 'px';
 
 let contX = document.getElementById('cont-x');
 let contY = document.getElementById('cont-y');
@@ -41,43 +42,55 @@ let wall6 = new Wall(content, 'wall-6', new Point(0, 300), 330, 5);
 let wall7 = new Wall(content, 'wall-7', new Point(630, 0), 5, 280);
 */
 
-let height = contentY-220;
-let width = contentX-600;
-let wall = new Wall(content, 'wall', new Point(contentX /2 - width /2, contentY /2 - height /2 ), width, height);
+let height = contentY - 220;
+let width = contentX - 600;
+let wall = new Wall(content, 'wall', new Point(contentX / 2 - width / 2, contentY / 2 - height / 2), width, height);
 var wallHeight = (contentY - 240) / 3;
 let gateHeight = 120;
-let wall8 = new Wall(content, 'wall-8', new Point(contentX - 120, 0), 5, wallHeight);
-let wall9 = new Wall(content, 'wall-9', new Point(contentX - 120, wallHeight + gateHeight), 5, wallHeight);
-let wall10 = new Wall(content, 'wall-10', new Point(contentX - 120, wallHeight * 2 + gateHeight * 2), 5, wallHeight);
-let gate = new Gates(content, 'gate', new Point(contentX - 115, wallHeight - gateHeight), 10, gateHeight);
-let gate2 = new Gates(content, 'gate-2', new Point(contentX - 115, wallHeight * 2), 10, gateHeight);
+//let wall8 = new Wall(content, 'wall-8', new Point(contentX - 120, 0), 5, wallHeight);
+//let wall9 = new Wall(content, 'wall-9', new Point(contentX - 120, wallHeight + gateHeight), 5, wallHeight);
+//let wall10 = new Wall(content, 'wall-10', new Point(contentX - 120, wallHeight * 2 + gateHeight * 2), 5, wallHeight);
+//let gate = new Gates(content, 'gate', new Point(contentX - 115, wallHeight - gateHeight), 10, gateHeight);
+//let gate2 = new Gates(content, 'gate-2', new Point(contentX - 115, wallHeight * 2), 10, gateHeight);
 
-let wall2 = new Wall(content, 'wall-2', new Point(120, 0), 5, wallHeight);
-let wall3 = new Wall(content, 'wall-3', new Point(120, wallHeight + gateHeight), 5, wallHeight);
-let wall4 = new Wall(content, 'wall-4', new Point(120, wallHeight * 2 + gateHeight * 2), 5, wallHeight);
-let gate3 = new Gates(content, 'gate-3', new Point(115, wallHeight - gateHeight), 10, gateHeight);
-let gate4 = new Gates(content, 'gate-4', new Point(115, wallHeight * 2), 10, gateHeight);
+//let wall2 = new Wall(content, 'wall-2', new Point(120, 0), 5, wallHeight);
+//let wall3 = new Wall(content, 'wall-3', new Point(120, wallHeight + gateHeight), 5, wallHeight);
+//let wall4 = new Wall(content, 'wall-4', new Point(120, wallHeight * 2 + gateHeight * 2), 5, wallHeight);
+//let gate3 = new Gates(content, 'gate-3', new Point(115, wallHeight - gateHeight), 10, gateHeight);
+//let gate4 = new Gates(content, 'gate-4', new Point(115, wallHeight * 2), 10, gateHeight);
 
-gate.openTimer = 12;
-gate3.openTimer = 7;
 
-let stall = new Stall(content, 'stall', new Point(0, 0), 120, contentY /2);
-let stall2 = new Stall(content, 'stall-2', new Point(0, contentY /2), 120, contentY);
-let stall3 = new Stall(content, 'stall-3', new Point(contentX - 115, 0), 120, contentY / 2);
-let stall4 = new Stall(content, 'stall-4', new Point(contentX - 115, contentY /2), 120, contentY);
+let stall = new Stall(content, 'stall', new Point(0, 0), 120, contentY / 2, 'right', true);
+let stall2 = new Stall(content, 'stall-2', new Point(0, contentY / 2), 120, contentY / 2, 'right', false);
+let stall3 = new Stall(content, 'stall-3', new Point(contentX - 115, 0), 120, contentY / 2, 'left', false);
+let stall4 = new Stall(content, 'stall-4', new Point(contentX - 115, contentY / 2), 120, contentY / 2, 'left', true);
 
-let gates = [gate, gate2, gate3, gate4];
-let walls = [
-   wall,
-    wall2,wall3, wall4,
+stall2.openTimer = 12;
+stall4.openTimer = 7;
+
+let gates = [
+    //gate, gate2, gate3, gate4
+];
+var walls = [
+//    wall,
+    //  wall2,wall3, wall4,
     //wall, wall2, wall3, wall4, wall5, wall6, wall7,
-    wall8, wall9, wall10];
+    // wall8, wall9, wall10
+];
 let stalls = [
+/*
     stall,
     stall2,
     stall3,
     stall4,
+*/
 ];
+//walls = [stall.walls[0], stall.walls[1]];
+
+stalls.forEach((stall) => {
+    walls = walls.concat(stall.walls);
+    gates = gates.concat(stall.gates);
+});
 let cows = [];
 
 let score = 0;
@@ -132,14 +145,12 @@ window.onload = () => {
 
 
     content.onmousemove = handlerMove;
-    for (let i = 0; i < 10; i++) {
+  /*  for (let i = 0; i < 10; i++) {
         let cow = generateCow('cow-' + i);
         cows.push(cow);
-    }
-  /*  let cow = new Cow(content, 'cow', new Point(300, 300), 100, 100);
-    cows.push(cow);
-*/
-
+    }*/
+     let cow = new Cow(content, 'cow', new Point(300, 300), 100, 100);
+     cows.push(cow);
     /********************************************
      * Прорисовка всех объектов
      ********************************************/
@@ -170,12 +181,23 @@ window.onload = () => {
 
         cows.forEach((cow) => {
             cow.manageStates(s);
+            if (cow.sleepTimer > SLEEP_TIME) {
+                cow.sleepTimer = 0;
+                cow.setState(COW_RUN);
+                cow.moveOnRoute();
+                stalls.forEach((stall) => {
+                    if (cow.inObject(stall)) {
+                        stall.cows--;
+                    }
+                })
+            }
+
         });
 
-        gates.forEach((gate) => {
-            gate.openTimer++;
-            if (gate.openTimer > gate.maxTimer) {
-                gate.prepare();
+        stalls.forEach((stall) => {
+            stall.openTimer++;
+            if (stall.openTimer > stall.maxTimer) {
+                stall.changeState();
             }
         });
 
@@ -184,89 +206,140 @@ window.onload = () => {
         }
         dog.incTimer();
 
-    }, 1000 );
+
+
+
+    }, 1000);
 
     /**
      *Таймер для прорисовки объектов
      */
 
-    setInterval(() => {
 
-        cows.forEach((cow) => {
-            //cow.doStaff();
 
-            walls.forEach((wall) => {
-                if (cow.isCollideWith(wall)) {
-                    console.log("Collide!!!");
+    var running = true;
+
+    window.requestAnimationFrame = (function () {
+        return window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            window.oRequestAnimationFrame ||
+            window.msRequestAnimationFrame ||
+            function (callback, element) {
+                return window.setTimeout(callback, 1000 / FPS);
+            };
+    })();
+
+    function loop(){
+        if(running){
+            /*dog.makeDirectionToPoint();*/
+
+            cows.forEach((cow) => {
+                //cow.doStaff();
+
+                walls.forEach((wall) => {
+                    if (cow.isCollideWith(wall)) {
+                        console.log("Collide!!!");
+                    }
+                });
+
+                cows.forEach((item) => {
+                    if (cow !== item) {
+                        if (cow.isCollideWith(item)) {
+                            let v = cow.calculateVectorFromPoint(item.getX, item.getY);
+                            cow.addVector(v);
+                        }
+                    }
+                });
+
+                gates.forEach((gate) => {
+                    if (cow.isCollideWith(gate)) {
+                        console.log("Collide!!!");
+                    }
+                });
+
+                let inStall = false;
+                let currentStall;
+                stalls.forEach((stall) => {
+                    if (cow.inObject(stall)) {
+                        inStall = true;
+                        currentStall = stall;
+                    }
+                });
+
+                if (inStall && !cow.isOnRoute() && !cow.isSleeping()) {
+                    //cow.sleep();
+                    if (currentStall.cows === 0) {
+                        cow.addPointToRoute(new Point(currentStall.location.x + 60, currentStall.location.y + 60));
+                    } else {
+                        cow.addPointToRoute(new Point(currentStall.location.x + 60, currentStall.location.y - 60 + currentStall.height));
+                    }
+                    cow.moveOnRoute();
+                    cow.run();
+                    cow.available = false;
+
+
                 }
-            });
 
-            cows.forEach((item) => {
-                if (cow !== item) {
-                    if (cow.isCollideWith(item)) {
-                        let v = cow.calculateVectorFromPoint(item.getX, item.getY);
-                        cow.addVector(v);
+                cow.doStaff();
+                if (cow.isArrived() && !cow.isSleeping() && inStall) {
+                    score++;
+                    document.getElementById('score').innerText = 'Total: ' + score;
+                    //alert('+1 bone!');
+                    cow.sleep();
+                    currentStall.cows++;
+                    cow.stand();
+                    cow.route = cow.route.concat(currentStall.escapeRoute);
+                    cow.addPointToRoute(cow.respawnPoint);
+                }
+
+                if (cow.isArrived() && !cow.isSleeping() && !inStall) {
+                    cow.eat();
+                    cow.stand();
+                }
+
+                if (cow.isSleeping() && inStall) {
+                    if (!currentStall.isOpen && cow.sleepTimer > SLEEP_TIME - 2) {
+                        cow.sleepTimer = SLEEP_TIME - 3;
                     }
                 }
+
             });
 
             gates.forEach((gate) => {
-                if (cow.isCollideWith(gate)) {
-                    console.log("Collide!!!");
-                }
+                gate.doThing();
+            });
+            dog.makeVectorToDestination();
+
+            cows.forEach((item) => {
+                    if (dog.isCollideWith(item)) {
+                    }
             });
 
-            let inStall = false;
-            let inStallPoint;
-            stalls.forEach((stall) => {
-                if (cow.inObject(stall) ) {
-                    inStall = true;
-                    inStallPoint = new Point(stall.location.x + 60, stall.location.y + 60);
-                }
-            });
-
-            /*if (inStall && cow.isOnRoute()) {
-                //cow.sleep();
-                cow.addPointToRoute(new Point(50, 100));
-                cow.moveOnRoute();
-                cow.available = false;
-                score++;
-                document.getElementById('score').innerText = 'Total: ' + score;
-            }*/
-            if (inStall && !cow.isOnRoute() && !cow.isSleeping()) {
-                //cow.sleep();
-                cow.addPointToRoute(inStallPoint);
-                cow.moveOnRoute();
-                cow.run();
-                cow.available = false;
-                score++;
-                document.getElementById('score').innerText = 'Total: ' + score;
-            }
-
-           /* if (inStall && cow.isArrived() && !cow.isSleeping()) {
-                alert(true);
-                cow.sleep();
-            }*/
-            cow.doStaff();
-            if (cow.isArrived() && !cow.isSleeping()) {
-                alert('+1 bone!');
-                cow.sleep();
-                cow.stand();
-            }
-
-        });
-
-        gates.forEach((gate) => {
-            gate.doThing();
-        })
+            dog.move();
 
 
-    }, 1000 / FPS);
+
+
+            requestAnimationFrame(loop);
+        }
+    }
+    requestAnimationFrame(loop);
+
+
+
+
 
     //---------------------------------------
 
     function handlerMove(event) {
+        dog.route = []
+        dog.addPointToRoute(new Point(event.clientX, event.clientY));
 
+
+        dog.moving = true;
+        dog.moveOnRoute();
+        console.log(dog);
         let dogBarks = false;
 
         cows.forEach((cow) => {
@@ -274,10 +347,10 @@ window.onload = () => {
             if (cow.calculateDistanceToPoint(event.clientX, event.clientY) <= DISTANTION_TO_DOG) {
                 dogBarks = true;
                 cow.makeDirectionFromPoint(event.clientX, event.clientY);
-                    cow.run();
-                    //displayVector(cow);
+                cow.run();
+                //displayVector(cow);
             } else {
-                    cow.setCurrentState();
+                cow.setCurrentState();
             }
 
         });
@@ -303,4 +376,21 @@ function displayVector(cow) {
     vectorLog.setAttribute('d', "M 200 200 l " + cow.vector.getX * 20 + " " + cow.vector.getY * 20);
 }
 
-content.onclick = () => {console.log(cows)};
+content.onclick = () => {
+    console.log(cows)
+};
+
+
+var $circle = $('.circle');
+
+/*
+function moveCircle(e) {
+    TweenLite.to($circle, 0.3, {
+        css: {
+            left: e.pageX,
+            top: e.pageY
+        }
+    });
+}
+
+$(window).on('mousemove', moveCircle);*/

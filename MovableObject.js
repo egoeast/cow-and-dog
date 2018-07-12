@@ -37,7 +37,7 @@ export class MovableObject extends BaseObject {
     move() {
         if (this.moving) {
 
-            if (this.route.length!==0) {
+            if (this.route.length !== 0) {
                 //let v  = new Vector()
             }
             let vector = this.vector;
@@ -46,8 +46,8 @@ export class MovableObject extends BaseObject {
 
             if (this.getX < 0) this.location.x = 0;
             if (this.getY < 0) this.location.y = 0;
-            if (this.getX > this.container.clientWidth - this.width ) this.location.x = this.container.clientWidth - this.width ;
-            if (this.getY > this.container.clientHeight - this.height ) this.location.y = this.container.clientHeight - this.height ;
+            if (this.getX > this.container.clientWidth - this.width) this.location.x = this.container.clientWidth - this.width;
+            if (this.getY > this.container.clientHeight - this.height) this.location.y = this.container.clientHeight - this.height;
 
             this.element.style.top = (this.getY) + 'px';
             this.element.style.left = (this.getX) + 'px';
@@ -73,6 +73,7 @@ export class MovableObject extends BaseObject {
     }
 
     makeVectorToDestination() {
+        if (this.route.length !==0){
         let v = new Vector(this.route[0].x - this.center.x, this.route[0].y - this.center.y);
         let tempV = Object.assign(new Vector(0, 0), v);
         v.normalize();
@@ -82,9 +83,12 @@ export class MovableObject extends BaseObject {
             this.vector = tempV;
             this.moving = false;
             this.route.shift();
-            this.movingStatus = ARRIVED;
+            if (this.route.length === 0) {
+                this.movingStatus = ARRIVED;
+            }
         } else {
             this.vector = v;
+        }
         }
         return false;
     }

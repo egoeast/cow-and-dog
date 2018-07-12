@@ -5,7 +5,7 @@ export class Gates extends MovableObject {
 
     constructor(element, id, point, width, height) {
         super(element, id, point, width, height);
-        this.isOpened = true;
+        this.isOpened = false;
         this.openTimer = 0;
         this.maxTimer = 10;
         this.destinationPoint = null;
@@ -17,15 +17,14 @@ export class Gates extends MovableObject {
         this.element.style.background = 'black';
     }
 
-    prepare() {
+    changeState() {
         this.openTimer = 0;
         if (this.isOpened) {
             this.route.push( new Point(this.center.x, this.center.y + this.height) );
-            this.isOpened = false;
         } else {
             this.route.push( new Point(this.center.x, this.center.y - this.height) );
-            this.isOpened = true;
         }
+        this.isOpened = !this.isOpened;
         this.moving = true;
 
     }

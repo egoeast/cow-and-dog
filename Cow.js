@@ -23,9 +23,9 @@ export class Cow extends MovableObject {
         this.sleepTimer = 0;
         this.eatTimer = 0;
         this.currentState = getRandomInt(0, STATES.length);
-        this.respawnPoint = Object.assign(new Point(0, 0), point);
+        this.respawnPoint = Object.assign(new Point(0, 0), this.center);
         this.imageDirection = DIRECTION_RIGHT;
-        this.speed = 12;
+        this.speed = 4;
     }
 
     draw() {
@@ -53,6 +53,7 @@ export class Cow extends MovableObject {
                     this.moving = false;
                     this.isAvailable = false;
                     this.sleepTimer = 0;
+                    this.currentState = 2;
                     break;
                 }
                 case COW_RUN : {
@@ -231,13 +232,13 @@ export class Cow extends MovableObject {
             this.eatTimer++;
         }
 
-        if (this.sleepTimer > SLEEP_TIME) {
+      /*  if (this.sleepTimer > SLEEP_TIME) {
             this.sleepTimer = 0;
-            this.respawn();
-           // this.addPointToRoute(new Point(1950,310));
-            //  this.addPointToRoute(this.respawnPoint);
-            this.eat();
-        }
+            //this.respawn();
+            //this.eat();
+            this.setState(COW_RUN);
+            this.moveOnRoute();
+        }*/
 
         if (this.eatTimer > EAT_TIME) {
             this.scat();

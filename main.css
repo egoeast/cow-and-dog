@@ -11,35 +11,35 @@
     width: 2000px;
     height: 1000px;
     background: aliceblue;
+   /* cursor: none;*/
 
 }
 
 .dog-bark {
     /*cursor: move;*/
-    cursor: url('i/dog_step-5-barks.svg'), pointer;
+    /*cursor: url('i/dog_step-5-barks.svg'), pointer;*/
 }
 
 .dog-run {
     /*cursor: cell;*/
-    cursor: url('i/dog_step-5-run.svg'), pointer;
+    /*cursor: url('i/dog_step-5-run.svg'), pointer;*/
 }
 
 .dog-sit {
     /*cursor: pointer;*/
-    cursor: url('i/dog_step-4-sit.svg'), pointer;
+   /* cursor: url('i/dog_step-4-sit.svg'), pointer;*/
 }
 
 #wall {
     cursor: pointer;
 }
 
-
 #score {
     position: absolute;
     background: red;
     height: 20px;
     width: 50px;
-    z-index: 11;
+    z-index: 1000;
 }
 
 
@@ -65,3 +65,18 @@
     background: red;
 }
 */
+.not-available {
+
+}
+
+.circle {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    top: 50%;
+    left: 50%;
+    margin: -50px 0 0 -50px;
+    background: #CB4B16;
+    border-radius: 80%;
+    backface-visibility: hidden;
+}

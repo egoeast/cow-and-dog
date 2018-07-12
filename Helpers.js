@@ -28,6 +28,18 @@ export class Point {
         [this.x, this.y] = newValue;
     }
 
+    addXY(x,y) {
+        this.x += x;
+        this.y += y;
+    }
+
+    addXYAndClone(x, y) {
+        let temp = Object.assign(new Point(0, 0), this);
+        temp.addXY(x ,y);
+        return temp;
+    }
+
+
 }
 
 export class Vector extends Point {
@@ -71,3 +83,5 @@ export class Vector extends Point {
 export function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
+
+
