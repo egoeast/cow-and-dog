@@ -20,6 +20,7 @@ export class Cow extends MovableObject {
 
     constructor(element, id, point, width, height) {
         super(element, id, point, width, height);
+        console.log(this);
         this.sleepTimer = 0;
         this.eatTimer = 0;
         this.currentState = getRandomInt(0, STATES.length);
@@ -52,6 +53,7 @@ export class Cow extends MovableObject {
                     this.setImage('i/mm_cow_eat.gif');
                     this.moving = false;
                     this.isAvailable = false;
+                    this.element.classList.add('not-available');
                     this.sleepTimer = 0;
                     this.currentState = 2;
                     break;
@@ -60,6 +62,7 @@ export class Cow extends MovableObject {
                     this.setImage('i/mm_cow_run.gif');
                     this.moving = true;
                     this.isAvailable = true;
+                    this.element.classList.remove('not-available');
                     this.sleepTimer = 0;
                     this.eatTimer = 0;
                     break;
@@ -68,6 +71,7 @@ export class Cow extends MovableObject {
                     this.setImage('i/mm_cow_moos.gif');
                     this.moving = false;
                     this.isAvailable = true;
+                    this.element.classList.remove('not-available');
                     this.eatTimer = 0;
                     this.sleepTimer = 0;
                     break;
@@ -76,20 +80,24 @@ export class Cow extends MovableObject {
                     this.setImage('i/mm_cow_sleep.gif');
                     this.moving = false;
                     this.isAvailable = false;
+                    this.element.classList.add('not-available');
                     this.eatTimer = 0;
                     break;
                 }
                 case COW_SCAT : {
                     this.setImage('i/mm_cow_scat.gif');
                     this.moving = false;
+                    this.element.classList.remove('not-available');
                     this.isAvailable = true;
                     this.eatTimer = 0;
                     this.sleepTimer = 0;
+                    this.currentState = 0;
                     break;
                 }
                 case COW_SKIP : {
                     this.setImage('i/mm_cow_skipping.gif');
                     this.moving = false;
+                    this.element.classList.remove('not-available');
                     this.isAvailable = true;
                     this.eatTimer = 0;
                     this.sleepTimer = 0;
@@ -101,7 +109,6 @@ export class Cow extends MovableObject {
             }
         }
     }
-
 
     nextRandomState() {
         this.currentState = getRandomInt(0, STATES.length);
@@ -127,9 +134,7 @@ export class Cow extends MovableObject {
         this.element.children[0].setAttribute('src', path);
     }
 
-    calculateDistanceToPoint(x, y) {
-        return Math.sqrt(Math.pow(this.center.x - x, 2) + Math.pow(this.center.y - y, 2));
-    }
+
 
     makeDirectionFromPoint(x, y) {
         if (this.moving) {
@@ -205,6 +210,11 @@ export class Cow extends MovableObject {
         if (this.isAvailable) {
             this.setState(COW_RUN);
         }
+    }
+
+    runFrom(object) {
+        this.makeDirectionFromPoint(object.center.x, object.center.y);
+        this.run();
     }
 
     scat() {

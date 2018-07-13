@@ -54,6 +54,11 @@ export class MovableObject extends BaseObject {
         }
     }
 
+    calculateVectorToPoint(point) {
+        let v = new Vector(point.x - this.center.x, point.y - this.center.y);
+        return v;
+    }
+
     makeDirectionToPoint(x, y) {
         let v = new Vector(x - this.center.x, y - this.center.y);
         let tempV = Object.assign(new Vector(0, 0), v);
@@ -73,22 +78,30 @@ export class MovableObject extends BaseObject {
     }
 
     makeVectorToDestination() {
-        if (this.route.length !==0){
-        let v = new Vector(this.route[0].x - this.center.x, this.route[0].y - this.center.y);
-        let tempV = Object.assign(new Vector(0, 0), v);
-        v.normalize();
-        v.multiplicate(this.speed);
-
-        if (tempV.vectorLength() <= v.vectorLength()) {
-            this.vector = tempV;
-            this.moving = false;
-            this.route.shift();
-            if (this.route.length === 0) {
-                this.movingStatus = ARRIVED;
+        if (this.route.length !== 0) {
+            let v = new Vector(this.route[0].x - this.center.x, this.route[0].y - this.center.y);
+            let tempV = Object.assign(new Vector(0, 0), v);
+            v.normalize();
+            if (this.calculateDistanceToPoint(this.route[0].x, this.route[0].y) > 600) {
+                v.multiplicate(this.speed * 3);
+            } else {
+                if (this.calculateDistanceToPoint(this.route[0].x, this.route[0].y) > 300) {
+                    v.multiplicate(this.speed * 2);
+                } else {
+                    v.multiplicate(this.speed);
+                }
             }
-        } else {
-            this.vector = v;
-        }
+
+            if (tempV.vectorLength() <= v.vectorLength()) {
+                this.vector = tempV;
+                this.moving = false;
+                this.route.shift();
+                if (this.route.length === 0) {
+                    this.movingStatus = ARRIVED;
+                }
+            } else {
+                this.vector = v;
+            }
         }
         return false;
     }
@@ -98,6 +111,86 @@ export class MovableObject extends BaseObject {
         this.element.style.top = (this.getY) + 'px';
         this.element.style.left = (this.getX) + 'px';
         this.setPosition();
+    }
+
+
+    get getV() {
+        return this.vector;
+    }
+
+    addVector(vector) {
+        this.vector.addVector(vector);
+    }
+
+    moveOnRoute() {
+        this.movingStatus = ON_ROUTE;
+    }
+
+    isOnRoute() {
+        return this.movingStatus === ON_ROUTE;
+    }
+
+    isArrived() {
+        return this.movingStatus === ARRIVED;
+    }
+
+    stand() {
+        this.movingStatus = STAND;
+    }
+
+    calculateDistanceToPoint(x, y) {
+        return Math.sqrt(Math.pow(this.center.x - x, 2) + Math.pow(this.center.y - y, 2));
+    }
+
+    distanceTo(object) {
+        return this.calculateDistanceToPoint(object.center.x, object.center.y);
+    }
+
+    isCollideRoundWith(object) {
+
+        let distanceX = this.calculateDistanceToPoint(object.center.x, this.center.y);
+        let distanceY = this.calculateDistanceToPoint(this.center.x, object.center.y);
+
+        let directionX = 0;
+        if (this.vector.x > 0) {
+            directionX = 1
+        } else {
+            directionX = -1
+        }
+        let directionY = 0;
+        if (this.vector.y > 0) {
+            directionY = 1
+        } else {
+            directionY = -1
+        }
+        let collideX;
+        let collideY;
+        //Определяем с какой стороны от обекта находится наш обЪект
+        if (this.center.x < object.center.x) {
+            collideX = distanceX - this.vector.x;
+        } else {
+            collideX = distanceX + this.vector.x;
+        }
+        if (this.center.y < object.center.y) {
+            collideY = distanceY - this.vector.y;
+        } else {
+            collideY = distanceY + this.vector.y;
+        }
+
+
+        let distance = this.calculateDistanceToPoint(object.center.x, object.center.y);
+        let v = new Vector(0, 0);
+        v = this.calculateVectorToPoint(object.center);
+        v.normalize();
+        v.multiplicate(distance - (object.width / 2 + this.width / 2));
+
+        if (distance < object.width / 2 + this.width / 2) {
+            this.vector.addVector(v);
+            return true;
+        }
+
+        return false;
+
     }
 
     isCollideWith(object) {
@@ -131,6 +224,72 @@ export class MovableObject extends BaseObject {
             collideY = distanceY + this.vector.y;
         }
 
+        if ((collideX < object.width / 2 + this.width / 2) && (collideY < object.height / 2 + this.height / 2)) {
+
+            if ((this.width / 2 + object.width / 2) - collideX > ((this.height / 2 + object.height / 2) - collideY)) {
+                this.vector.y = directionY * (distanceY - (this.height / 2 + object.height / 2));
+
+            }
+            if ((this.width / 2 + object.width / 2) - collideX < ((this.height / 2 + object.height / 2) - collideY)) {
+                this.vector.x = directionX * (distanceX - (this.width / 2 + object.width / 2));
+            }
+
+            if ((this.width / 2 + object.width / 2) - collideX === ((this.height / 2 + object.height / 2) - collideY))
+            {
+                alert('ahtung');
+            }
+                return true;
+        }
+
+        return false;
+    }
+
+
+
+    checkIfCollide(object) {
+        let distanceX = this.calculateDistanceToPoint(object.center.x, this.center.y);
+        let distanceY = this.calculateDistanceToPoint(this.center.x, object.center.y);
+        if ((distanceX < object.width / 2 + this.width / 2) && (distanceY < object.height / 2 + this.height / 2)) {
+           // alert(this.vector.x + ' ' + this.vector.y);
+        }
+
+
+    };
+
+    isCollideWithWalls(object) {
+
+
+        let distanceX = this.calculateDistanceToPoint(object.center.x, this.center.y);
+        let distanceY = this.calculateDistanceToPoint(this.center.x, object.center.y);
+
+        let directionX = 0;
+        if (this.vector.x > 0) {
+            directionX = 1
+        } else {
+            directionX = -1
+        }
+        let directionY = 0;
+        if (this.vector.y > 0) {
+            directionY = 1
+        } else {
+            directionY = -1
+        }
+        let collideX;
+        let collideY;
+        //Определяем с какой стороны от обекта находится наш обЪект
+        if (this.center.x < object.center.x) {
+            collideX = distanceX - this.vector.x;
+        } else {
+            collideX = distanceX + this.vector.x;
+        }
+        if (this.center.y < object.center.y) {
+            collideY = distanceY - this.vector.y;
+        } else {
+            collideY = distanceY + this.vector.y;
+        }
+
+
+
 
         if ((collideX < object.width / 2 + this.width / 2) && (collideY < object.height / 2 + this.height / 2)) {
 
@@ -146,28 +305,6 @@ export class MovableObject extends BaseObject {
         return false;
     }
 
-    get getV() {
-        return this.vector;
-    }
 
-    addVector(vector) {
-        this.vector.addVector(vector);
-    }
-
-    moveOnRoute() {
-        this.movingStatus = ON_ROUTE;
-    }
-
-    isOnRoute() {
-        return this.movingStatus === ON_ROUTE;
-    }
-
-    isArrived() {
-        return this.movingStatus === ARRIVED;
-    }
-
-    stand() {
-        this.movingStatus = STAND;
-    }
 
 }

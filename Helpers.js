@@ -77,6 +77,11 @@ export class Vector extends Point {
         this.x += vector.getX;
         this.y += vector.getY;
     }
+
+    revert() {
+        this.x = -this.x;
+        this.y = -this.y;
+    }
 }
 
 

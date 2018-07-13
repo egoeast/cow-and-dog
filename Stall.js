@@ -31,7 +31,6 @@ export class Stall extends BaseObject {
         }
         if(isOpen) {
             this.changeState();
-            console.log(this);
         }
     }
 

@@ -5,14 +5,13 @@ import {Wall} from "./Wall";
 import {Stall} from "./Stall";
 import {Cow} from "./Cow";
 import {Dog} from "./Dog";
-import {COW_RUN, SLEEP_TIME} from "./constants";
+import {COW_RUN, SLEEP_TIME, DOG_DELAY_SIT} from "./constants";
 
 const FPS = 60;
-const DISTANTION_TO_DOG = 200;
+const DISTANTION_TO_DOG = 300;
 
 let content = document.getElementById('content');
-
-let dog = new Dog(content, 'dog', new Point(300, 300), 60, 60);
+let dog = new Dog(content, 'dog', new Point(300, 0), 100, 100);
 console.log(dog)
 dog.draw();
 
@@ -44,7 +43,7 @@ let wall7 = new Wall(content, 'wall-7', new Point(630, 0), 5, 280);
 
 let height = contentY - 220;
 let width = contentX - 600;
-let wall = new Wall(content, 'wall', new Point(contentX / 2 - width / 2, contentY / 2 - height / 2), width, height);
+let wall = new Wall(content, 'wall', new Point(contentX / 2 - width / 2  + 200, contentY / 2 - height / 2 + 200), 20, 500);
 var wallHeight = (contentY - 240) / 3;
 let gateHeight = 120;
 //let wall8 = new Wall(content, 'wall-8', new Point(contentX - 120, 0), 5, wallHeight);
@@ -72,18 +71,16 @@ let gates = [
     //gate, gate2, gate3, gate4
 ];
 var walls = [
-//    wall,
+    wall,
     //  wall2,wall3, wall4,
     //wall, wall2, wall3, wall4, wall5, wall6, wall7,
     // wall8, wall9, wall10
 ];
 let stalls = [
-/*
     stall,
     stall2,
     stall3,
     stall4,
-*/
 ];
 //walls = [stall.walls[0], stall.walls[1]];
 
@@ -145,12 +142,12 @@ window.onload = () => {
 
 
     content.onmousemove = handlerMove;
-  /*  for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 13; i++) {
         let cow = generateCow('cow-' + i);
         cows.push(cow);
-    }*/
-     let cow = new Cow(content, 'cow', new Point(300, 300), 100, 100);
-     cows.push(cow);
+    }
+    /*let cow = new Cow(content, 'cow', new Point(600, 600), 100, 100);
+    cows.push(cow);*/
     /********************************************
      * Прорисовка всех объектов
      ********************************************/
@@ -201,12 +198,10 @@ window.onload = () => {
             }
         });
 
-        if (dog.timer > 3) {
+        if (dog.timer >= DOG_DELAY_SIT) {
             dog.sit();
         }
         dog.incTimer();
-
-
 
 
     }, 1000);
@@ -230,8 +225,8 @@ window.onload = () => {
             };
     })();
 
-    function loop(){
-        if(running){
+    function loop() {
+        if (running) {
             /*dog.makeDirectionToPoint();*/
 
             cows.forEach((cow) => {
@@ -284,6 +279,7 @@ window.onload = () => {
                 cow.doStaff();
                 if (cow.isArrived() && !cow.isSleeping() && inStall) {
                     score++;
+                    dog.getBone();
                     document.getElementById('score').innerText = 'Total: ' + score;
                     //alert('+1 bone!');
                     cow.sleep();
@@ -312,22 +308,34 @@ window.onload = () => {
             dog.makeVectorToDestination();
 
             cows.forEach((item) => {
-                    if (dog.isCollideWith(item)) {
-                    }
+                if (dog.isCollideRoundWith(item)) {
+                }
+            });
+
+            walls.forEach((item) => {
+                if (dog.isCollideWith(item)) {
+                }
+            });
+
+            gates.forEach((item) => {
+                if (dog.isCollideWith(item)) {
+                }
+            });
+
+            walls.forEach((item) => {
+                if (dog.checkIfCollide(item)) {
+                }
             });
 
             dog.move();
 
 
 
-
             requestAnimationFrame(loop);
         }
     }
+
     requestAnimationFrame(loop);
-
-
-
 
 
     //---------------------------------------
@@ -339,15 +347,13 @@ window.onload = () => {
 
         dog.moving = true;
         dog.moveOnRoute();
-        console.log(dog);
         let dogBarks = false;
 
         cows.forEach((cow) => {
 
-            if (cow.calculateDistanceToPoint(event.clientX, event.clientY) <= DISTANTION_TO_DOG) {
+            if (cow.distanceTo(dog) <= DISTANTION_TO_DOG) {
                 dogBarks = true;
-                cow.makeDirectionFromPoint(event.clientX, event.clientY);
-                cow.run();
+                cow.runFrom(dog);
                 //displayVector(cow);
             } else {
                 cow.setCurrentState();
@@ -359,7 +365,9 @@ window.onload = () => {
             dog.bark();
             dog.clearTimer();
         } else {
-            dog.run();
+            if (!dog.isGetBone()) {
+                dog.run();
+            }
             dog.clearTimer();
 
         }
@@ -381,11 +389,9 @@ content.onclick = () => {
 };
 
 
-var $circle = $('.circle');
-
 /*
 function moveCircle(e) {
-    TweenLite.to($circle, 0.3, {
+    TweenLite.to(dog.element, 0.3, {
         css: {
             left: e.pageX,
             top: e.pageY
@@ -393,4 +399,5 @@ function moveCircle(e) {
     });
 }
 
-$(window).on('mousemove', moveCircle);*/
+$(window).on('mousemove', moveCircle);
+*/

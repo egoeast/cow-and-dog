@@ -25,3 +25,5 @@ export const STATES = [
 export const DOG_SIT = 'dog-sit';
 export const DOG_RUN = 'dog-run';
 export const DOG_BARK = 'dog-bark';
+export const DOG_GET_BONE = 'dog-bone';
+export const DOG_DELAY_SIT = 2;

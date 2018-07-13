@@ -1,6 +1,6 @@
 .obj {
     position: absolute;
-   /* background: green;*/
+    background: green;
 }
 
 .obj img{
@@ -11,7 +11,7 @@
     width: 2000px;
     height: 1000px;
     background: aliceblue;
-   /* cursor: none;*/
+    /*cursor: none;*/
 
 }
 
@@ -28,6 +28,15 @@
 .dog-sit {
     /*cursor: pointer;*/
    /* cursor: url('i/dog_step-4-sit.svg'), pointer;*/
+}
+
+#dog {
+    /*background: green;*/
+}
+
+
+#dog img {
+   border-radius: 50%;
 }
 
 #wall {
@@ -65,8 +74,8 @@
     background: red;
 }
 */
-.not-available {
-
+.not-available img{
+    opacity: 0.7;
 }
 
 .circle {
