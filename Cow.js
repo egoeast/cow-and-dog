@@ -20,7 +20,6 @@ export class Cow extends MovableObject {
 
     constructor(element, id, point, width, height) {
         super(element, id, point, width, height);
-        console.log(this);
         this.sleepTimer = 0;
         this.eatTimer = 0;
         this.currentState = getRandomInt(0, STATES.length);
@@ -162,7 +161,7 @@ export class Cow extends MovableObject {
     }
 
     checkDirection() {
-        if (this.isAvailable) {
+        if (this.isAvailable && Math.abs(this.vector.getX)>2) {
             if (this.vector.getX < 0 && this.imageDirection !== DIRECTION_LEFT) {
                 this.imageDirection = DIRECTION_LEFT;
                 this.element.children[0].className = 'left';

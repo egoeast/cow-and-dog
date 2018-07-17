@@ -1,6 +1,6 @@
 .obj {
     position: absolute;
-    background: green;
+   /* background: green;*/
 }
 
 .obj img{
@@ -10,8 +10,8 @@
 #content {
     width: 2000px;
     height: 1000px;
-    background: aliceblue;
-    /*cursor: none;*/
+   /* background: darkgrey;*/
+    cursor: none;
 
 }
 

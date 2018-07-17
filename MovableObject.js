@@ -1,5 +1,5 @@
 import {BaseObject} from "./BaseObject";
-import {Vector} from "./Helpers";
+import {Point, Vector} from "./Helpers";
 
 export const STAND = 'stand';
 export const ARRIVED = 'arrived';
@@ -190,6 +190,21 @@ export class MovableObject extends BaseObject {
         }
 
         return false;
+        /*      let newPoint = Object.assign(new Point(0,0), object.center);
+              newPoint.x = this.center.x + this.vector.x;
+              newPoint.y = this.center.y + this.vector.y;
+
+              let distance = object.calculateDistanceToPoint(newPoint.x, newPoint.y);
+              if (distance <= this.width /2 + object.width /2 ) {
+
+                  distance = this.calculateDistanceToPoint(object.center.x, object.center.y) - (this.width /2 + object.width /2) ;
+
+
+                  this.vector.normalize();
+                  this.vector.multiplicate(distance);
+                  console.log(this.vector);
+              }
+      */
 
     }
 
@@ -234,33 +249,15 @@ export class MovableObject extends BaseObject {
                 this.vector.x = directionX * (distanceX - (this.width / 2 + object.width / 2));
             }
 
-            if ((this.width / 2 + object.width / 2) - collideX === ((this.height / 2 + object.height / 2) - collideY))
-            {
-                alert('ahtung');
-            }
-                return true;
+            return true;
         }
+
 
         return false;
     }
 
 
-
     checkIfCollide(object) {
-        let distanceX = this.calculateDistanceToPoint(object.center.x, this.center.y);
-        let distanceY = this.calculateDistanceToPoint(this.center.x, object.center.y);
-        if ((distanceX < object.width / 2 + this.width / 2) && (distanceY < object.height / 2 + this.height / 2)) {
-           // alert(this.vector.x + ' ' + this.vector.y);
-        }
-
-
-    };
-
-    isCollideWithWalls(object) {
-
-
-        let distanceX = this.calculateDistanceToPoint(object.center.x, this.center.y);
-        let distanceY = this.calculateDistanceToPoint(this.center.x, object.center.y);
 
         let directionX = 0;
         if (this.vector.x > 0) {
@@ -274,37 +271,156 @@ export class MovableObject extends BaseObject {
         } else {
             directionY = -1
         }
-        let collideX;
-        let collideY;
-        //Определяем с какой стороны от обекта находится наш обЪект
-        if (this.center.x < object.center.x) {
-            collideX = distanceX - this.vector.x;
+
+        let newCenter = Object.assign(new Point(0, 0), this.center);
+        newCenter.x = this.center.x + this.vector.x;
+        newCenter.y = this.center.y + this.vector.y;
+
+
+        let circleX = newCenter.x - object.center.x;
+        let circleY = newCenter.y - object.center.y;
+
+        circleX = (circleX < 0) ? -circleX - object.width / 2 : circleX -
+            object.width / 2;
+        circleY = (circleY < 0) ? -circleY - object.height / 2 : circleY -
+            object.height / 2;
+        if (circleX <= 0 && circleY <= this.width / 2) {
+            return true;
         } else {
-            collideX = distanceX + this.vector.x;
-        }
-        if (this.center.y < object.center.y) {
-            collideY = distanceY - this.vector.y;
-        } else {
-            collideY = distanceY + this.vector.y;
-        }
+            if (circleY <= 0 && circleX <= this.width / 2) {
 
+                return true;
 
-
-
-        if ((collideX < object.width / 2 + this.width / 2) && (collideY < object.height / 2 + this.height / 2)) {
-
-            if ((this.width / 2 + object.width / 2) - collideX > ((this.height / 2 + object.height / 2) - collideY)) {
-                this.vector.y = directionY * (distanceY - (this.height / 2 + object.height / 2));
 
             } else {
-                this.vector.x = directionX * (distanceX - (this.width / 2 + object.width / 2));
+                if ((circleX * circleX + circleY * circleY) <= this.width / 2 * this.width / 2) {
+                    console.log(Math.sqrt(circleX * circleX + circleY * circleY));
+                    return true;
+
+                }
             }
-            return true;
         }
+
+
+    };
+
+    isCollideWithWalls(object) {
+
+        let directionX = 0;
+        if (this.vector.x > 0) {
+            directionX = 1
+        } else {
+            directionX = -1
+        }
+        let directionY = 0;
+        if (this.vector.y > 0) {
+            directionY = 1
+        } else {
+            directionY = -1
+        }
+
+        let newCenter = Object.assign(new Point(0, 0), this.center);
+        newCenter.x = this.center.x + this.vector.x;
+        newCenter.y = this.center.y + this.vector.y;
+
+
+        let circleX = newCenter.x - object.center.x;
+        let circleY = newCenter.y - object.center.y;
+
+        circleX = (circleX < 0) ? -circleX - object.width / 2 : circleX -
+            object.width / 2;
+        circleY = (circleY < 0) ? -circleY - object.height / 2 : circleY -
+            object.height / 2;
+        if (circleX <= 0 && circleY <= this.width / 2) {
+            this.vector.y = this.vector.y - directionY * (this.width / 2 - circleY);
+            return true;
+        } else {
+            if (circleY <= 0 && circleX <= this.width / 2) {
+
+                this.vector.x = this.vector.x - directionX * (this.width / 2 - circleX);
+                //this.vector.x =  Math.round(this.vector.x * 100000000) / 100000000 ;
+
+                return true;
+
+
+            } else {
+                if ((circleX * circleX + circleY * circleY) <= this.width / 2 * this.width / 2) {
+
+                    this.vector.normalize();
+                    this.vector.revert();
+                    this.vector.multiplicate(0.5);
+                    /* if ( circleX > circleY) {
+                         this.vector.x = this.vector.x - directionX * ( Math.sqrt((this.width / 2) * (this.width / 2))- (Math.sqrt(circleY * circleY + circleX * circleX)));
+                     //} else {
+                         this.vector.y = this.vector.y - directionY * ( Math.sqrt((this.width / 2) * (this.width / 2))- (Math.sqrt(circleY * circleY + circleX * circleX)));
+                     }*/
+                    //this.vector.y = this.vector.y - directionY * (Math.abs(Math.sqrt(circleY*circleY + circleX*circleX) - Math.sqrt((this.width / 2) * (this.width / 2))));
+                    //alert('circleY');
+
+                    /* if (circleY <= this.width / 2) {
+                         this.vector.y = this.vector.y - directionY * (Math.abs(circleY - this.width / 2));
+                     } else
+                         this.vector.x = this.vector.x - directionX * (Math.abs(circleX - this.width / 2));
+ */
+                    /*  if (circleX > circleY) {
+                          this.vector.x = this.vector.x - directionX * (Math.abs(circleX - this.width / 2));
+                      } else {
+                          this.vector.y = this.vector.y - directionY * (Math.abs(circleY - this.width / 2));
+                      } if (circleX === circleY) { alert(true)}
+  */
+
+                    //this.vector.x = this.vector.x - directionX * (Math.abs(circleX - this.width / 2));
+                    //this.vector.multiplicate(Math.abs(this.vector.vectorLength() - Math.sqrt(Math.abs(circleX * circleX + circleY * circleY - this.width / 2 * this.width / 2))));
+                    //this.vector.x = this.vector.x - directionX * Math.sqrt(Math.abs(circleX * circleX + circleY * circleY - this.width / 2 * this.width / 2));
+                    //this.vector.y = this.vector.y - directionY * Math.sqrt(Math.abs(circleY * circleY - (this.width / 2) * (this.width / 2)));
+                    //this.vector.y = this.vector.y - directionY*(Math.abs(circleY - this.width /2));
+                    //console.log(this.vector.x, this.vector.y);
+                    return true;
+
+                }
+            }
+        }
+
 
         return false;
     }
 
+    circleInSquare(object) {
+        let newHalfWidth = (object.width + this.width) / 2;
+        let newHalfHeight = (object.height + this.height) / 2;
+        let newCenter = Object.assign(new Point(0, 0), this.center);
+        newCenter.x += this.vector.x;
+        newCenter.y += this.vector.y;
+
+        let collideX = (newCenter.x >= object.center.x - newHalfWidth) && (newCenter.x <= object.center.x + newHalfWidth);
+        let collideY = (newCenter.y >= object.center.y - newHalfHeight) && (newCenter.y <= object.center.y + newHalfHeight);
+
+
+
+        if (collideX && collideY) {
+            let minX = Math.min(newCenter.x - (object.center.x - newHalfWidth), object.center.x + newHalfWidth - newCenter.x);
+            let minY = Math.min(newCenter.y - (object.center.y - newHalfHeight), object.center.y + newHalfHeight - newCenter.y);
+            console.log(minX, minY);
+
+            if (minX < minY) {
+                if (newCenter.x - (object.center.x - newHalfWidth) < object.center.x + newHalfWidth - newCenter.x) {
+                    this.vector.x = object.center.x - newHalfWidth - this.center.x;
+                } else {
+                    this.vector.x = object.center.x + newHalfWidth - this.center.x;
+                }
+            } else
+                if (newCenter.y - (object.center.y - newHalfHeight) < object.center.y + newHalfHeight - newCenter.y) {
+                    this.vector.y = object.center.y - newHalfHeight - this.center.y;
+                } else {
+                    this.vector.y = object.center.y + newHalfWidth - this.center.y;
+                }
+            //this.vector.y = 0;
+            return true
+        }
+
+        return false;
+
+    }
 
 
 }

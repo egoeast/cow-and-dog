@@ -1,15 +1,16 @@
-import {DIRECTION_LEFT, DIRECTION_RIGHT, DOG_BARK, DOG_GET_BONE, DOG_RUN, DOG_SIT, STATES} from "./constants";
+import {DIRECTION_LEFT, DIRECTION_RIGHT, DOG_BARK, DOG_GET_BONE, DOG_RUN, DOG_SIT, STATES, DOG_SKIPPING} from "./constants";
 import {MovableObject} from "./MovableObject";
 import {Vector} from "./Helpers";
 
-export class Dog extends MovableObject{
+export class Dog extends MovableObject {
     constructor(element, id, point, width, height) {
         super(element, id, point, width, height);
-        console.log(this);
         this.element = element;
         this.setState(DOG_SIT);
         this.timer = 0;
         this.speed = 10;
+        this.barkTimer = 0;
+        this.scoreTimer = 0;
     }
 
     draw() {
@@ -17,7 +18,7 @@ export class Dog extends MovableObject{
         //this.element.id = this.id;
         let img = document.createElement('img');
         this.element.appendChild(img);
-        this.run();
+        this.sit();
         this.element.style.position = 'absolute';
         this.element.style.padding = 0 + 'px';
         this.element.style.zIndex = 1000;
@@ -29,6 +30,7 @@ export class Dog extends MovableObject{
             switch (this.state) {
                 case DOG_BARK : {
                     this.setImage('i/mm_dog_barks.gif');
+                    this.barkTimer = 0;
                     break;
                 }
                 case DOG_RUN : {
@@ -41,6 +43,11 @@ export class Dog extends MovableObject{
                 }
                 case DOG_GET_BONE : {
                     this.setImage('i/mm_dog_bone.gif');
+                    this.scoreTimer = 0;
+                    break;
+                }
+                case DOG_SKIPPING : {
+                    this.setImage('i/mm_dog_skipping.gif');
                     break;
                 }
 
@@ -57,17 +64,27 @@ export class Dog extends MovableObject{
         this.timer++;
     }
 
-    clearTimer()
-    {
+    clearTimer() {
         this.timer = 0;
     }
 
+    isGetBone() {
+        return this.state === DOG_GET_BONE
+    }
     sit() {
         this.setState(DOG_SIT);
     }
 
+    isBark() {
+        return this.state === DOG_BARK
+    }
+
     bark() {
         this.setState(DOG_BARK);
+    }
+
+    skip() {
+        this.setState(DOG_SKIPPING);
     }
 
     run() {
@@ -79,9 +96,6 @@ export class Dog extends MovableObject{
         this.setState(DOG_GET_BONE);
     }
 
-    isGetBone() {
-        return this.state === DOG_GET_BONE;
-    }
 
     makeDirectionToPoint(x, y) {
         let v = new Vector(x - this.center.x, y - this.center.y);
@@ -90,13 +104,14 @@ export class Dog extends MovableObject{
         this.vector = v;
         return false;
     }
+
     move() {
-        this.checkDirection();
+        this.checkDirection()
         super.move()
     }
 
     checkDirection() {
-
+        if (Math.abs(this.vector.getX) > 2) {
             if (this.vector.getX < 0 && this.imageDirection !== DIRECTION_LEFT) {
                 this.imageDirection = DIRECTION_LEFT;
                 this.element.children[0].className = 'left';
@@ -105,9 +120,9 @@ export class Dog extends MovableObject{
                 this.imageDirection = DIRECTION_RIGHT;
                 this.element.children[0].className = '';
             }
+        }
 
     }
-
 
 
 }

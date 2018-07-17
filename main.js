@@ -12,7 +12,6 @@ const DISTANTION_TO_DOG = 300;
 
 let content = document.getElementById('content');
 let dog = new Dog(content, 'dog', new Point(300, 0), 100, 100);
-console.log(dog)
 dog.draw();
 
 var scrollHeight = Math.max(
@@ -43,10 +42,10 @@ let wall7 = new Wall(content, 'wall-7', new Point(630, 0), 5, 280);
 
 let height = contentY - 220;
 let width = contentX - 600;
-let wall = new Wall(content, 'wall', new Point(contentX / 2 - width / 2  + 200, contentY / 2 - height / 2 + 200), 20, 500);
+let wall = new Wall(content, 'wall', new Point(contentX / 2 - width / 2 + 350, contentY / 2 - height / 2 + 200), 500, 500);
 var wallHeight = (contentY - 240) / 3;
 let gateHeight = 120;
-//let wall8 = new Wall(content, 'wall-8', new Point(contentX - 120, 0), 5, wallHeight);
+let wall2 = new Wall(content, 'wall-2', new Point(350, 350), 50, 200);
 //let wall9 = new Wall(content, 'wall-9', new Point(contentX - 120, wallHeight + gateHeight), 5, wallHeight);
 //let wall10 = new Wall(content, 'wall-10', new Point(contentX - 120, wallHeight * 2 + gateHeight * 2), 5, wallHeight);
 //let gate = new Gates(content, 'gate', new Point(contentX - 115, wallHeight - gateHeight), 10, gateHeight);
@@ -72,6 +71,7 @@ let gates = [
 ];
 var walls = [
     wall,
+    wall2
     //  wall2,wall3, wall4,
     //wall, wall2, wall3, wall4, wall5, wall6, wall7,
     // wall8, wall9, wall10
@@ -198,6 +198,21 @@ window.onload = () => {
             }
         });
 
+        if (dog.isGetBone()) {
+            if (dog.scoreTimer >= DOG_DELAY_SIT) {
+                dog.run();
+            }
+            dog.scoreTimer++;
+        }
+
+        if (dog.isBark()) {
+            if (dog.barkTimer >= 2) {
+                dog.run();
+            }
+            dog.barkTimer++;
+        }
+
+
         if (dog.timer >= DOG_DELAY_SIT) {
             dog.sit();
         }
@@ -240,7 +255,7 @@ window.onload = () => {
 
                 cows.forEach((item) => {
                     if (cow !== item) {
-                        if (cow.isCollideWith(item)) {
+                        if (cow.circleInSquare(item)) {
                             let v = cow.calculateVectorFromPoint(item.getX, item.getY);
                             cow.addVector(v);
                         }
@@ -264,7 +279,7 @@ window.onload = () => {
 
                 if (inStall && !cow.isOnRoute() && !cow.isSleeping()) {
                     //cow.sleep();
-                    if (currentStall.cows === 0) {
+                    if (currentStall.cows % 2 === 0) {
                         cow.addPointToRoute(new Point(currentStall.location.x + 60, currentStall.location.y + 60));
                     } else {
                         cow.addPointToRoute(new Point(currentStall.location.x + 60, currentStall.location.y - 60 + currentStall.height));
@@ -312,23 +327,25 @@ window.onload = () => {
                 }
             });
 
-            walls.forEach((item) => {
-                if (dog.isCollideWith(item)) {
-                }
-            });
+            /* walls.forEach((item) => {
+                 if (dog.isCollideWithWalls(item)) {
+                     //alert(true)
+                 }
+             });*/
 
             gates.forEach((item) => {
-                if (dog.isCollideWith(item)) {
+                if (dog.circleInSquare(item)) {
                 }
             });
 
             walls.forEach((item) => {
-                if (dog.checkIfCollide(item)) {
+                if (dog.circleInSquare(item)) {
+                    //alert('collide')
+                    //console.log('collide');
                 }
             });
 
             dog.move();
-
 
 
             requestAnimationFrame(loop);
@@ -361,11 +378,11 @@ window.onload = () => {
 
         });
 
-        if (dogBarks) {
-            dog.bark();
+        if (dogBarks && !dog.isGetBone() && !dog.isBark()) {
+            dog.skip();
             dog.clearTimer();
         } else {
-            if (!dog.isGetBone()) {
+            if (!dog.isGetBone() && !dog.isBark()) {
                 dog.run();
             }
             dog.clearTimer();
@@ -385,7 +402,16 @@ function displayVector(cow) {
 }
 
 content.onclick = () => {
-    console.log(cows)
+    //console.log(cows)
+    cows.forEach((cow) => {
+        if (cow.distanceTo(dog) <= DISTANTION_TO_DOG) {
+            cow.scat();
+            cow.runFrom(dog);
+            dog.bark();
+            //displayVector(cow);
+            console.log(cow)
+        }
+    })
 };
 
 
