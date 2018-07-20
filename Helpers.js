@@ -33,13 +33,16 @@ export class Point {
         this.y += y;
     }
 
+    addPoint(point) {
+        this.x += point.x;
+        this.y += point.y;
+    }
+
     addXYAndClone(x, y) {
         let temp = Object.assign(new Point(0, 0), this);
         temp.addXY(x ,y);
         return temp;
     }
-
-
 }
 
 export class Vector extends Point {

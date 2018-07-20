@@ -13,6 +13,7 @@ import {
     EAT_TIME,
     SLEEP_TIME,
     STATE_TIME,
+    COW_SPEED,
 } from "./constants";
 
 
@@ -23,9 +24,10 @@ export class Cow extends MovableObject {
         this.sleepTimer = 0;
         this.eatTimer = 0;
         this.currentState = getRandomInt(0, STATES.length);
-        this.respawnPoint = Object.assign(new Point(0, 0), this.center);
+        this.respawnPoint = Object.assign(new Point(), this.center);
         this.imageDirection = DIRECTION_RIGHT;
-        this.speed = 4;
+        this.speed = COW_SPEED;
+        this.boostTimer = 0;
     }
 
     draw() {
@@ -123,7 +125,7 @@ export class Cow extends MovableObject {
     }
 
     setCurrentState() {
-        if (!this.isSleeping()){
+        if (!this.isSleeping()) {
             this.setState(STATES[this.currentState]);
         }
     }
@@ -134,22 +136,27 @@ export class Cow extends MovableObject {
     }
 
 
-
     makeDirectionFromPoint(x, y) {
         if (this.moving) {
             let v = new Vector(this.center.x - x, this.center.y - y);
             v.normalize();
-            v.multiplicate(this.speed);
+            if (this.isBoosting()) {
+                v.multiplicate(this.speed * 3)
+            } else {
+                v.multiplicate(this.speed);
+            }
 
-            let angle = 0.5 * getRandomInt(-1, 1);
+            /*let angle = 0.5 * getRandomInt(-1, 1);
             this.vector.x = v.x * Math.cos(angle) - v.y * Math.sin(angle);
-            this.vector.y = v.y * Math.cos(angle) + v.x * Math.sin(angle);
-
-            //this.vector  = v;
+            this.vector.y = v.y * Math.cos(angle) + v.x * Math.sin(angle);*/
+            this.vector  = v;
             this.checkDirection();
         }
         return false;
     }
+
+
+
 
     makeDirectionToPoint(x, y) {
         let v = new Vector(x - this.center.x, y - this.center.y);
@@ -161,7 +168,7 @@ export class Cow extends MovableObject {
     }
 
     checkDirection() {
-        if (this.isAvailable && Math.abs(this.vector.getX)>2) {
+        if (this.isAvailable && Math.abs(this.vector.getX) > 2) {
             if (this.vector.getX < 0 && this.imageDirection !== DIRECTION_LEFT) {
                 this.imageDirection = DIRECTION_LEFT;
                 this.element.children[0].className = 'left';
@@ -241,13 +248,17 @@ export class Cow extends MovableObject {
             this.eatTimer++;
         }
 
-      /*  if (this.sleepTimer > SLEEP_TIME) {
-            this.sleepTimer = 0;
-            //this.respawn();
-            //this.eat();
-            this.setState(COW_RUN);
-            this.moveOnRoute();
-        }*/
+        if (this.boostTimer > 0) {
+            this.boostTimer--;
+        }
+
+        /*  if (this.sleepTimer > SLEEP_TIME) {
+              this.sleepTimer = 0;
+              //this.respawn();
+              //this.eat();
+              this.setState(COW_RUN);
+              this.moveOnRoute();
+          }*/
 
         if (this.eatTimer > EAT_TIME) {
             this.scat();
@@ -261,9 +272,19 @@ export class Cow extends MovableObject {
     doStaff() {
         if (this.movingStatus === ON_ROUTE) {
             this.moving = true;
-           this.makeVectorToDestination();
+            this.makeVectorToDestination();
         }
         this.move();
 
+    }
+
+    boost() {
+        if (this.boostTimer === 0) {
+            this.boostTimer = 2;
+        }
+    }
+
+    isBoosting() {
+        return this.boostTimer > 0;
     }
 }

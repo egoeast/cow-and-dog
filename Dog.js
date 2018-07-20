@@ -1,4 +1,14 @@
-import {DIRECTION_LEFT, DIRECTION_RIGHT, DOG_BARK, DOG_GET_BONE, DOG_RUN, DOG_SIT, STATES, DOG_SKIPPING} from "./constants";
+import {
+    DIRECTION_LEFT,
+    DIRECTION_RIGHT,
+    DOG_BARK,
+    DOG_GET_BONE,
+    DOG_RUN,
+    DOG_SIT,
+    STATES,
+    DOG_SKIPPING,
+    DOG_DELAY_SIT
+} from "./constants";
 import {MovableObject} from "./MovableObject";
 import {Vector} from "./Helpers";
 
@@ -122,6 +132,27 @@ export class Dog extends MovableObject {
             }
         }
 
+    }
+
+    manageStates() {
+        if (this.isGetBone()) {
+            if (this.scoreTimer >= DOG_DELAY_SIT) {
+                this.run();
+            }
+            this.scoreTimer++;
+        }
+
+        if (this.isBark()) {
+            if (this.barkTimer >= 2) {
+                this.run();
+            }
+            this.barkTimer++;
+        }
+
+        if (this.timer >= DOG_DELAY_SIT) {
+            this.sit();
+        }
+        this.incTimer();
     }
 
 

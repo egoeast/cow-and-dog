@@ -7,6 +7,8 @@ export class BaseObject {
         this.id = id;
         this.height = height;
         this.location = point;
+        let coords = this.container.getBoundingClientRect();
+        this.location.x -= coords.x;
         this.center = new Point(point.getX + width / 2, point.getY + height / 2);
     }
 

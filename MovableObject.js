@@ -10,7 +10,7 @@ export class MovableObject extends BaseObject {
     constructor(element, id, point, width, height) {
         super(element, id, point, width, height);
         this.moving = false;
-        this.speed = 9;
+        this.speed = 10;
         this.vector = new Vector(0, 0)
         this.route = [];
         this.movingStatus = STAND;
@@ -48,7 +48,6 @@ export class MovableObject extends BaseObject {
             if (this.getY < 0) this.location.y = 0;
             if (this.getX > this.container.clientWidth - this.width) this.location.x = this.container.clientWidth - this.width;
             if (this.getY > this.container.clientHeight - this.height) this.location.y = this.container.clientHeight - this.height;
-
             this.element.style.top = (this.getY) + 'px';
             this.element.style.left = (this.getX) + 'px';
         }
@@ -148,37 +147,7 @@ export class MovableObject extends BaseObject {
 
     isCollideRoundWith(object) {
 
-        let distanceX = this.calculateDistanceToPoint(object.center.x, this.center.y);
-        let distanceY = this.calculateDistanceToPoint(this.center.x, object.center.y);
-
-        let directionX = 0;
-        if (this.vector.x > 0) {
-            directionX = 1
-        } else {
-            directionX = -1
-        }
-        let directionY = 0;
-        if (this.vector.y > 0) {
-            directionY = 1
-        } else {
-            directionY = -1
-        }
-        let collideX;
-        let collideY;
-        //Определяем с какой стороны от обекта находится наш обЪект
-        if (this.center.x < object.center.x) {
-            collideX = distanceX - this.vector.x;
-        } else {
-            collideX = distanceX + this.vector.x;
-        }
-        if (this.center.y < object.center.y) {
-            collideY = distanceY - this.vector.y;
-        } else {
-            collideY = distanceY + this.vector.y;
-        }
-
-
-        let distance = this.calculateDistanceToPoint(object.center.x, object.center.y);
+        let distance = this.calculateDistanceToPoint(object.center.x - this.vector.x, object.center.y - this.vector.y);
         let v = new Vector(0, 0);
         v = this.calculateVectorToPoint(object.center);
         v.normalize();
@@ -190,21 +159,6 @@ export class MovableObject extends BaseObject {
         }
 
         return false;
-        /*      let newPoint = Object.assign(new Point(0,0), object.center);
-              newPoint.x = this.center.x + this.vector.x;
-              newPoint.y = this.center.y + this.vector.y;
-
-              let distance = object.calculateDistanceToPoint(newPoint.x, newPoint.y);
-              if (distance <= this.width /2 + object.width /2 ) {
-
-                  distance = this.calculateDistanceToPoint(object.center.x, object.center.y) - (this.width /2 + object.width /2) ;
-
-
-                  this.vector.normalize();
-                  this.vector.multiplicate(distance);
-                  console.log(this.vector);
-              }
-      */
 
     }
 
@@ -294,7 +248,7 @@ export class MovableObject extends BaseObject {
 
             } else {
                 if ((circleX * circleX + circleY * circleY) <= this.width / 2 * this.width / 2) {
-                    console.log(Math.sqrt(circleX * circleX + circleY * circleY));
+
                     return true;
 
                 }
@@ -385,7 +339,7 @@ export class MovableObject extends BaseObject {
         return false;
     }
 
-    circleInSquare(object) {
+    collideCircleWithSquare(object) {
         let newHalfWidth = (object.width + this.width) / 2;
         let newHalfHeight = (object.height + this.height) / 2;
         let newCenter = Object.assign(new Point(0, 0), this.center);
@@ -400,7 +354,6 @@ export class MovableObject extends BaseObject {
         if (collideX && collideY) {
             let minX = Math.min(newCenter.x - (object.center.x - newHalfWidth), object.center.x + newHalfWidth - newCenter.x);
             let minY = Math.min(newCenter.y - (object.center.y - newHalfHeight), object.center.y + newHalfHeight - newCenter.y);
-            console.log(minX, minY);
 
             if (minX < minY) {
                 if (newCenter.x - (object.center.x - newHalfWidth) < object.center.x + newHalfWidth - newCenter.x) {
@@ -412,7 +365,7 @@ export class MovableObject extends BaseObject {
                 if (newCenter.y - (object.center.y - newHalfHeight) < object.center.y + newHalfHeight - newCenter.y) {
                     this.vector.y = object.center.y - newHalfHeight - this.center.y;
                 } else {
-                    this.vector.y = object.center.y + newHalfWidth - this.center.y;
+                    this.vector.y = object.center.y + newHalfHeight - this.center.y;
                 }
             //this.vector.y = 0;
             return true
