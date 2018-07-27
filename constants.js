@@ -8,6 +8,8 @@ export const COW_SKIP = 'skip';
 export const COW_SPEED = 3;
 export const COWS_NUMBER = 10;
 
+export const IMG_FOLDER = '/i'
+
 export const SLEEP_TIME = 25;
 export const EAT_TIME = 5;
 export const STATE_TIME = 5;

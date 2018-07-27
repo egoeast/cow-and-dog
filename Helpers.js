@@ -28,9 +28,14 @@ export class Point {
         [this.x, this.y] = newValue;
     }
 
-    addXY(x,y) {
+    addXY(x, y) {
         this.x += x;
         this.y += y;
+    }
+
+    minusXY(x, y) {
+        this.x -= x;
+        this.y -= y;
     }
 
     addPoint(point) {
@@ -40,7 +45,7 @@ export class Point {
 
     addXYAndClone(x, y) {
         let temp = Object.assign(new Point(0, 0), this);
-        temp.addXY(x ,y);
+        temp.addXY(x, y);
         return temp;
     }
 }

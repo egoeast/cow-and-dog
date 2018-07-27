@@ -3,8 +3,8 @@ import {Point} from "./Helpers";
 
 export class Gates extends MovableObject {
 
-    constructor(element, id, point, width, height) {
-        super(element, id, point, width, height);
+    constructor(element, id, point, width, height, canvas) {
+        super(element, id, point, width, height, canvas);
         this.isOpened = false;
         this.openTimer = 0;
         this.maxTimer = 10;

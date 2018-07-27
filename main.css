@@ -1,8 +1,11 @@
+body {
+    margin: 0px;
+}
+
 .empty {
-    height: 100px;
-    width: 100%;
+    height: 300px;
     background: deepskyblue;
-    position: absolute;
+    /*position: absolute;*/
 }
 
 .obj {
@@ -15,15 +18,13 @@
 }
 
 #game-content {
-    position: absolute;
 
-    top: 100px;
-    left: 0;
+    
     margin-left: 10% ;
     width: 80%;
-    height: 1000px;
+    height: 700px;
 
-    /*background: darkgrey;*/
+    background: darkgrey;
    /* cursor: none;*/
 
 }

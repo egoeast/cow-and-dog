@@ -7,8 +7,8 @@ export const ON_ROUTE = 'on route';
 
 export class MovableObject extends BaseObject {
 
-    constructor(element, id, point, width, height) {
-        super(element, id, point, width, height);
+    constructor(element, id, point, width, height,canvas) {
+        super(element, id, point, width, height, canvas);
         this.moving = false;
         this.speed = 10;
         this.vector = new Vector(0, 0)
@@ -19,17 +19,7 @@ export class MovableObject extends BaseObject {
     moveToPoint() {
         if (this.moving) {
             this.makeVectorToDestination();
-            let vector = this.vector;
-            this.location.setCoord = [this.getX + vector.getX, this.getY + vector.getY];
-            this.center.setCoord = [this.getX + this.width / 2, this.getY + this.height / 2];
-
-            if (this.getX < 0) this.location.x = 0;
-            if (this.getY < 0) this.location.y = 0;
-            if (this.getX > this.container.clientWidth - this.width / 2) this.location.x = this.container.clientWidth - this.width / 2;
-            if (this.getY > this.container.clientHeight - this.height / 2) this.location.y = this.container.clientHeight - this.height / 2;
-
-            this.element.style.top = (this.getY) + 'px';
-            this.element.style.left = (this.getX) + 'px';
+            this.move();
         }
 
     }
@@ -41,15 +31,9 @@ export class MovableObject extends BaseObject {
                 //let v  = new Vector()
             }
             let vector = this.vector;
-            this.location.setCoord = [this.getX + vector.getX, this.getY + vector.getY];
-            this.center.setCoord = [this.getX + this.width / 2, this.getY + this.height / 2];
-
-            if (this.getX < 0) this.location.x = 0;
-            if (this.getY < 0) this.location.y = 0;
-            if (this.getX > this.container.clientWidth - this.width) this.location.x = this.container.clientWidth - this.width;
-            if (this.getY > this.container.clientHeight - this.height) this.location.y = this.container.clientHeight - this.height;
-            this.element.style.top = (this.getY) + 'px';
-            this.element.style.left = (this.getX) + 'px';
+            this.center.addXY(vector.getX, vector.getY);
+            this.checkPosition();
+            this.setElementPosition();
         }
     }
 

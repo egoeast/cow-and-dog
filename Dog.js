@@ -7,14 +7,16 @@ import {
     DOG_SIT,
     STATES,
     DOG_SKIPPING,
-    DOG_DELAY_SIT
+    DOG_DELAY_SIT,
+    IMG_FOLDER
 } from "./constants";
 import {MovableObject} from "./MovableObject";
 import {Vector} from "./Helpers";
 
+
 export class Dog extends MovableObject {
-    constructor(element, id, point, width, height) {
-        super(element, id, point, width, height);
+    constructor(element, id, point, width, height,canvas) {
+        super(element, id, point, width, height, canvas);
         this.element = element;
         this.setState(DOG_SIT);
         this.timer = 0;
@@ -39,25 +41,25 @@ export class Dog extends MovableObject {
             this.state = state;
             switch (this.state) {
                 case DOG_BARK : {
-                    this.setImage('i/mm_dog_barks.gif');
+                    this.setImage(IMG_FOLDER + '/mm_dog_barks.gif');
                     this.barkTimer = 0;
                     break;
                 }
                 case DOG_RUN : {
-                    this.setImage('i/mm_dog_run.gif');
+                    this.setImage(IMG_FOLDER + '/mm_dog_run.gif');
                     break;
                 }
                 case DOG_SIT : {
-                    this.setImage('i/mm_dog_sit.gif');
+                    this.setImage(IMG_FOLDER + '/mm_dog_sit.gif');
                     break;
                 }
                 case DOG_GET_BONE : {
-                    this.setImage('i/mm_dog_bone.gif');
+                    this.setImage(IMG_FOLDER + '/mm_dog_bone.gif');
                     this.scoreTimer = 0;
                     break;
                 }
                 case DOG_SKIPPING : {
-                    this.setImage('i/mm_dog_skipping.gif');
+                    this.setImage(IMG_FOLDER + '/mm_dog_skipping.gif');
                     break;
                 }
 

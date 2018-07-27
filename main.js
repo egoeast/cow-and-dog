@@ -6,6 +6,7 @@ import {Stall} from "./Stall";
 import {Cow} from "./Cow";
 import {Dog} from "./Dog";
 import {COW_RUN, SLEEP_TIME, DOG_DELAY_SIT, COWS_NUMBER} from "./constants";
+import {Canvas} from "./Canvas";
 
 const FPS = 60;
 const DISTANTION_TO_DOG = 300;
@@ -32,6 +33,8 @@ let height;
 let width;
 let wallHeight;
 let gateHeight;
+
+let canvas = new Canvas('game-content');
 
 
 function makeCanvas() {
@@ -94,7 +97,7 @@ function generateCow(id) {
         flag = true;
         let randX = getRandomInt(0, maxX);
         let randY = getRandomInt(0, maxY);
-        cow = new Cow(content, id, new Point(randX, randY), 100, 100);
+        cow = new Cow(content, id, new Point(randX, randY), 100, 100, canvas);
 
         walls.forEach((wall) => {
             if (cow.isCollideWith(wall)) {
@@ -128,10 +131,10 @@ function generateCowsAndStalls() {
 
     clearCanvas();
 
-    let stall = new Stall(content, 'stall', new Point(0, 0), 120, contentY / 2, 'right', true);
-    let stall2 = new Stall(content, 'stall-2', new Point(0, contentY / 2), 120, contentY / 2, 'right', false);
-    let stall3 = new Stall(content, 'stall-3', new Point(contentX - 115, 0), 120, contentY / 2, 'left', false);
-    let stall4 = new Stall(content, 'stall-4', new Point(contentX - 115, contentY / 2), 120, contentY / 2, 'left', true);
+    let stall = new Stall(content, 'stall', new Point(0, 0), 120, contentY / 2, 'right', true, canvas);
+    let stall2 = new Stall(content, 'stall-2', new Point(0, contentY / 2), 120, contentY / 2, 'right', false, canvas);
+    let stall3 = new Stall(content, 'stall-3', new Point(contentX - 115, 0), 120, contentY / 2, 'left', false, canvas);
+    let stall4 = new Stall(content, 'stall-4', new Point(contentX - 115, contentY / 2), 120, contentY / 2, 'left', true, canvas);
 
     stalls = [
         stall,
@@ -170,7 +173,10 @@ function touchMoveFunction(event) {
 }
 
 function mouseMoveFunction(event) {
-    onMoveAction(event.clientX, event.clientY);
+    let offset = canvas.getOffset;
+    let x = event.clientX- offset.x;
+    let y = event.clientY- offset.y;
+    onMoveAction(x, y);
 }
 
 
@@ -184,13 +190,15 @@ if ('ontouchstart' in window) {
 }
 
 window.onload = () => {
-
+    console.log(canvas.getOffset);
     content.onmousemove = mouseMoveFunction;
     makeCanvas();
     generateCowsAndStalls();
-    dog = new Dog(content, 'dog', new Point(300, 300), 100, 100);
+    let wall =  new Wall(canvas.element, 'wall-1-' + 1,new Point(1810, 1100), 40, 40, canvas);
+    wall.draw();
+    dog = new Dog(content, 'dog', new Point(200, 200), 100, 100, canvas);
     dog.draw();
-
+    console.log(canvas.getMaxHeight);
     /********************************************
      * Таймер для управления состояниями объектов
      ********************************************/
@@ -280,9 +288,9 @@ window.onload = () => {
                 if (inStall && !cow.isOnRoute() && !cow.isSleeping()) {
                     //cow.sleep();
                     if (currentStall.cows % 2 === 0) {
-                        cow.addPointToRoute(new Point(currentStall.location.x + 60, currentStall.location.y + 60));
+                        cow.addPointToRoute(new Point(currentStall.getX - 10, currentStall.getY - currentStall.halfHeight + 60));
                     } else {
-                        cow.addPointToRoute(new Point(currentStall.location.x + 60, currentStall.location.y - 60 + currentStall.height));
+                        cow.addPointToRoute(new Point(currentStall.getX - 10, currentStall.getY - 60 + currentStall.height));
                     }
                     cow.moveOnRoute();
                     cow.run();
@@ -360,6 +368,9 @@ window.onload = () => {
 function onMoveAction(clientX, clientY) {
     dog.route = []
     dog.addPointToRoute(new Point(clientX, clientY));
+    console.log(dog.route[0].x, dog.route[0].y);
+
+    //dog.addPointToRoute(new Point(-110, 1000));
     dog.moving = true;
     dog.moveOnRoute();
     let dogBarks = false;
@@ -409,8 +420,8 @@ window.onclick = () => {
 };
 
 window.onresize = (event) => {
-    /*makeCanvas();
+    clearCanvas();
+    makeCanvas();
     generateCowsAndStalls();
-    clearCanvas();*/
 };
 

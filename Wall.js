@@ -1,8 +1,8 @@
 import {BaseObject} from "./BaseObject";
 
 export class Wall extends BaseObject {
-    constructor(element, id, point, width, height) {
-        super(element, id, point, width, height);
+    constructor(element, id, point, width, height, canvas) {
+        super(element, id, point, width, height, canvas);
 
     }
 
